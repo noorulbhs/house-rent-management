@@ -22,6 +22,7 @@ export const routes: Routes = [
       { path: 'house-management', component: HouseManagementComponent },
       { path: 'rooms/:houseId', component: RoomManagementComponent },
       { path: 'rooms', component: RoomManagementComponent },
+      { path: 'students', loadComponent: () => import('./features/student-management/student-management.component').then(m => m.StudentManagementComponent) },
       // ...other routes
     ]
   }

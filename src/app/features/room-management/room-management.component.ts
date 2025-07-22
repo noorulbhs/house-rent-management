@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MockRoomService } from '../../service/mock-room.service';
 import { Room } from '../../mock-data/mock-rooms';
 import { MOCK_HOUSES } from '../../mock-data/mock-houses';
@@ -27,9 +27,14 @@ export class RoomManagementComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private roomService: MockRoomService,
     private authService: AuthService
   ) {}
+  goToRoomStudents(roomId: string) {
+    console.log('[RoomManagement] Navigating to students for roomId:', roomId);
+    this.router.navigate(['/students'], { queryParams: { roomId } });
+  }
 
   // Load rooms for a specific house (when coming from House Management)
   loadRoomsByHouse() {
@@ -59,10 +64,7 @@ export class RoomManagementComponent implements OnInit {
 
 
   ngOnInit() {
-    // Build a map of houseId to house name for quick lookup
-    MOCK_HOUSES.forEach(h => {
-      this.houseNameMap[h.id.toString()] = h.name;
-    });
+    this.buildHouseNameMap();
     this.route.paramMap.subscribe(params => {
       this.houseId = params.get('houseId');
       this.allMode = !this.houseId;
@@ -71,6 +73,13 @@ export class RoomManagementComponent implements OnInit {
       } else {
         this.loadAllRooms();
       }
+    });
+  }
+
+  buildHouseNameMap() {
+    this.houseNameMap = {};
+    MOCK_HOUSES.forEach(h => {
+      this.houseNameMap[h.id.toString()] = h.name;
     });
   }
 
@@ -85,13 +94,17 @@ export class RoomManagementComponent implements OnInit {
       this.formError = 'All fields are required.';
       return;
     }
+    // Always store houseId as string
+    this.formRoom.houseId = this.formRoom.houseId?.toString();
     if (this.isEditMode) {
       this.roomService.updateRoom(this.formRoom).subscribe(() => {
+        this.buildHouseNameMap();
         this.showForm = false;
         this.reloadRooms();
       });
     } else {
       this.roomService.addRoom(this.formRoom).subscribe(() => {
+        this.buildHouseNameMap();
         this.showForm = false;
         this.reloadRooms();
       });
@@ -122,7 +135,7 @@ export class RoomManagementComponent implements OnInit {
       capacity: 1,
       rentAmount: 0,
       status: 'AVAILABLE',
-      houseId: this.houseId || (this.availableHouses.length > 0 ? this.availableHouses[0].id : '')
+      houseId: ''
     };
     this.formError = '';
     this.showForm = true;
@@ -130,8 +143,14 @@ export class RoomManagementComponent implements OnInit {
 
   openEditRoom(room: Room) {
     this.isEditMode = true;
-    this.formRoom = { ...room };
+    // Ensure houseId is a string and matches the select options
+    this.formRoom = { ...room, houseId: room.houseId ? room.houseId.toString() : '' };
     this.formError = '';
     this.showForm = true;
+  }
+  // Get the house name for the currently selected houseId in the form
+  get selectedHouseName(): string {
+    if (!this.formRoom || !this.formRoom.houseId) return '';
+    return this.houseNameMap[this.formRoom.houseId] || '';
   }
 }

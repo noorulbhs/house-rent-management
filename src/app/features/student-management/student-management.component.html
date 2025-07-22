@@ -1,0 +1,158 @@
+
+
+<div class="student-management-root">
+  <h1 class="dashboard-heading">Student Management</h1>
+
+  <div *ngIf="showForm" class="modal-overlay fancy-blur">
+    <div class="modal-dialog fancy-modal">
+      <div class="modal-header-gradient d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons modal-header-icon">person</span>
+          <span class="modal-title">{{ isEditMode ? 'Edit Student' : 'Add Student' }}</span>
+        </div>
+        <button class="modal-close-btn" (click)="cancelForm()" aria-label="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <form (ngSubmit)="saveStudent()" #studentForm="ngForm" autocomplete="off" class="modal-form-content">
+        <div class="form-group">
+          <label>User ID</label>
+          <input class="form-control" [(ngModel)]="formStudent.userId" name="userId" required />
+        </div>
+        <div class="form-group">
+          <label>Aadhaar</label>
+          <input class="form-control" [(ngModel)]="formStudent.aadhaar" name="aadhaar" required />
+        </div>
+        <div class="form-group">
+          <label>DOB</label>
+          <input class="form-control" type="date" [(ngModel)]="formStudent.dob" name="dob" required />
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select class="form-control" [(ngModel)]="formStudent.gender" name="gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input class="form-control" [(ngModel)]="formStudent.address" name="address" required />
+        </div>
+        <div class="form-group">
+          <label>Emergency Contact</label>
+          <input class="form-control" [(ngModel)]="formStudent.emergencyContact" name="emergencyContact" required />
+        </div>
+        <div class="form-group">
+          <label>Room</label>
+          <select class="form-control" [(ngModel)]="formStudent.roomId" name="roomId" required>
+            <option value="" disabled *ngIf="!formStudent.roomId">Select Room</option>
+            <option *ngFor="let room of rooms" [value]="room.id">
+              Room {{ room.roomNumber }} - {{ houseNameMap[room.houseId] }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="formStudent.status" name="status" required>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Join Date</label>
+          <input class="form-control" type="date" [(ngModel)]="formStudent.joinDate" name="joinDate" required />
+        </div>
+        <div class="form-error" *ngIf="formError">{{ formError }}</div>
+        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+          <button class="modal-action-btn btn btn-success" type="submit" [disabled]="!studentForm.form.valid">{{ isEditMode ? 'Update' : 'Add' }}</button>
+          <button class="modal-action-btn btn btn-secondary" type="button" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="loading">Loading students...</div>
+  <div *ngIf="!loading && !selectedStudent">
+    <div *ngIf="students.length === 0" class="text-muted">
+      No students found.
+    </div>
+    <ul *ngIf="students.length > 0" class="room-list">
+      <li *ngFor="let student of students" class="room-item clickable">
+        <div (click)="selectStudent(student)">
+          <div class="room-title">{{ student.userId }}</div>
+          <div class="room-details">
+            Aadhaar: <b>{{ student.aadhaar }}</b> | Gender: {{ student.gender }} | Room: {{ getRoomDisplay(student.roomId) }}
+          </div>
+          <div class="room-status">Status: {{ student.status }}</div>
+        </div>
+        <div class="room-actions top-right">
+          <button class="icon-btn" title="Edit" (click)="$event.stopPropagation(); openEditStudent(student)"><span class="material-icons">edit</span></button>
+          <button class="icon-btn" title="Delete" (click)="$event.stopPropagation(); deleteStudent(student)"><span class="material-icons">delete</span></button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="selectedStudent" class="d-flex justify-content-center align-items-start mt-4">
+    <div class="card shadow student-detail-card enhanced-student-detail">
+      <div class="student-detail-header">
+        <div class="student-avatar">
+          <span class="material-icons student-avatar-icon">person</span>
+        </div>
+        <div class="student-header-info">
+          <h3 class="student-name mb-1">{{ selectedStudent.userId }}</h3>
+          <span class="student-status-badge" [ngClass]="{
+            'status-active': selectedStudent.status === 'ACTIVE',
+            'status-inactive': selectedStudent.status === 'INACTIVE',
+            'status-moved': selectedStudent.status === 'MOVED_OUT'
+          }">{{ selectedStudent.status }}</span>
+        </div>
+      </div>
+      <div class="student-detail-body">
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">badge</span>
+          <span class="student-detail-label">Aadhaar:</span>
+          <span class="student-detail-value">{{ selectedStudent.aadhaar }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">cake</span>
+          <span class="student-detail-label">DOB:</span>
+          <span class="student-detail-value">{{ selectedStudent.dob }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">wc</span>
+          <span class="student-detail-label">Gender:</span>
+          <span class="student-detail-value">{{ selectedStudent.gender }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">home</span>
+          <span class="student-detail-label">Address:</span>
+          <span class="student-detail-value">{{ selectedStudent.address }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">call</span>
+          <span class="student-detail-label">Emergency Contact:</span>
+          <span class="student-detail-value">{{ selectedStudent.emergencyContact }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">meeting_room</span>
+          <span class="student-detail-label">Room:</span>
+          <span class="student-detail-value">{{ getRoomDisplay(selectedStudent.roomId) }}</span>
+        </div>
+        <div class="student-detail-row">
+          <span class="material-icons student-detail-icon">event</span>
+          <span class="student-detail-label">Join Date:</span>
+          <span class="student-detail-value">{{ selectedStudent.joinDate }}</span>
+        </div>
+      </div>
+      <div class="student-detail-footer">
+        <button type="button" class="modal-action-btn btn btn-secondary d-flex align-items-center gap-1 mb-0 mt-3" (click)="backToList()">
+          <span style="line-height: 1.2; display: inline-block;">Back</span>
+        </button>
+      </div>
+    </div>
+  </div>
+<button class="add-btn fab" (click)="openAddStudent()" title="Add Student">
+  <span class="material-icons">add</span>
+</button>
+</div>

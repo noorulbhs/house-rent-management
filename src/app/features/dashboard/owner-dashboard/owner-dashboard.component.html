@@ -1,0 +1,8 @@
+<h1 class="dashboard-heading">Dashboard</h1>
+<div class="dashboard-summary">
+  <mat-card class="summary-card" *ngFor="let item of summary">
+    <mat-icon>{{ item.icon }}</mat-icon>
+    <div class="summary-title">{{ item.title }}</div>
+    <div class="summary-value">{{ item.value }}</div>
+  </mat-card>
+</div>

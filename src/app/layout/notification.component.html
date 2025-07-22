@@ -1,0 +1,17 @@
+<button mat-icon-button class="notification-btn" (click)="toggleAlerts()">
+  <mat-icon>notifications</mat-icon>
+  <span *ngIf="alerts.length > 0" class="notification-badge">{{ alerts.length }}</span>
+</button>
+<ng-container *ngIf="showAlerts">
+  <div class="alerts-overlay" (click)="closeAlerts()"></div>
+  <div class="alerts-dropdown">
+    <div class="alerts-title">Alerts & Notifications</div>
+    <mat-divider></mat-divider>
+    <div *ngIf="alerts.length === 0" class="alert-item empty">No alerts</div>
+    <div *ngFor="let alert of alerts" class="alert-item" [ngClass]="alert.type">
+      <mat-icon *ngIf="alert.type === 'warning'">warning</mat-icon>
+      <mat-icon *ngIf="alert.type === 'info'">info</mat-icon>
+      {{ alert.message }}
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,40 @@
+<div class="dashboard-root">
+  <app-header
+    [ownerName]="ownerName"
+    [isMobile]="isMobile"
+    [showUserDropdown]="showUserDropdown"
+    [toggleUserDropdown]="toggleUserDropdown.bind(this)"
+    [closeUserDropdown]="closeUserDropdown.bind(this)">
+    <app-notification
+      [alerts]="alerts"
+      [showAlerts]="showAlerts"
+      [toggleAlerts]="toggleAlerts.bind(this)"
+      [closeAlerts]="closeAlerts.bind(this)">
+    </app-notification>
+  </app-header>
+
+  <!-- Mobile menu button below header, left-aligned -->
+  <div *ngIf="isMobile" class="mobile-menu-btn-container">
+    <button mat-icon-button class="menu-btn" (click)="toggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+
+  <div class="dashboard-content">
+    <mat-sidenav-container class="dashboard-sidenav-container">
+      <mat-sidenav #sidenav [mode]="sidenavMode" [opened]="sidenavOpened" class="dashboard-sidenav" (closedStart)="sidenavOpened = false" (backdropClick)="sidenav.close()">
+        <mat-nav-list>
+          <a mat-list-item routerLink="/owner-dashboard" (click)="isMobile ? sidenav.close() : null"><mat-icon>dashboard</mat-icon> Dashboard</a>
+          <a mat-list-item routerLink="/house-management" (click)="isMobile ? sidenav.close() : null"><mat-icon>home</mat-icon> Houses</a>
+          <a mat-list-item routerLink="/rooms" (click)="isMobile ? sidenav.close() : null"><mat-icon>meeting_room</mat-icon> Rooms</a>
+          <a mat-list-item routerLink="/students" (click)="isMobile ? sidenav.close() : null"><mat-icon>people</mat-icon> Students</a>
+          <a mat-list-item routerLink="/rent" (click)="isMobile ? sidenav.close() : null"><mat-icon>payments</mat-icon> Rent</a>
+          <a mat-list-item routerLink="/reports" (click)="isMobile ? sidenav.close() : null"><mat-icon>bar_chart</mat-icon> Reports</a>
+        </mat-nav-list>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

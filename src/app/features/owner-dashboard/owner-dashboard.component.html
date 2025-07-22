@@ -1,0 +1,42 @@
+<div class="dashboard-root">
+  <mat-toolbar color="primary" class="dashboard-toolbar">
+    <span class="logo"><mat-icon>home</mat-icon> Rent Management</span>
+    <span class="spacer"></span>
+    <span class="owner-name">Hi, {{ ownerName }} 👋</span>
+    <button mat-icon-button><mat-icon>account_circle</mat-icon></button>
+  </mat-toolbar>
+  <div class="dashboard-content">
+    <mat-sidenav-container class="dashboard-sidenav-container">
+      <mat-sidenav mode="side" opened class="dashboard-sidenav">
+        <mat-nav-list>
+          <mat-list-item><mat-icon>dashboard</mat-icon> Dashboard</mat-list-item>
+          <mat-list-item><mat-icon>home</mat-icon> Houses</mat-list-item>
+          <mat-list-item><mat-icon>meeting_room</mat-icon> Rooms</mat-list-item>
+          <mat-list-item><mat-icon>people</mat-icon> Students</mat-list-item>
+          <mat-list-item><mat-icon>payments</mat-icon> Rent</mat-list-item>
+          <mat-list-item><mat-icon>bar_chart</mat-icon> Reports</mat-list-item>
+        </mat-nav-list>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <div class="dashboard-summary">
+          <mat-card class="summary-card" *ngFor="let item of summary">
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <div class="summary-title">{{ item.title }}</div>
+            <div class="summary-value">{{ item.value }}</div>
+          </mat-card>
+        </div>
+        <div class="dashboard-alerts">
+          <mat-card class="alerts-card">
+            <div class="alerts-title">Alerts</div>
+            <mat-divider></mat-divider>
+            <div *ngFor="let alert of alerts" class="alert-item" [ngClass]="alert.type">
+              <mat-icon *ngIf="alert.type === 'warning'">warning</mat-icon>
+              <mat-icon *ngIf="alert.type === 'info'">info</mat-icon>
+              {{ alert.message }}
+            </div>
+          </mat-card>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

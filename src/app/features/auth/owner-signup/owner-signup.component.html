@@ -1,0 +1,91 @@
+<div class="signup-root">
+  <div class="signup-image-col">
+    <div class="signup-image-bg">
+      <img src="/assets/rentalproperty-1024x682.jpg" alt="Rental Property" class="signup-image" />
+      <div class="signup-tagline">Start your rental journey with us!</div>
+    </div>
+  </div>
+  <div class="signup-form-col">
+    <mat-card class="signup-card">
+      <div class="signup-logo">
+        <mat-icon fontIcon="home" color="primary" class="logo-icon"></mat-icon>
+      </div>
+      <h2 class="signup-title">Create Owner Account</h2>
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Full Name</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input matInput formControlName="fullName" placeholder="Enter your full name" required>
+          <!-- Invisible matSuffix for alignment -->
+          <button mat-icon-button matSuffix type="button" style="opacity:0;pointer-events:none;">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+          <mat-error *ngIf="fullName?.invalid && fullName?.touched">Full name is required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Email</mat-label>
+          <mat-icon matPrefix>email</mat-icon>
+          <input matInput formControlName="email" type="email" placeholder="Enter your email" required>
+          <!-- Invisible matSuffix for alignment -->
+          <button mat-icon-button matSuffix type="button" style="opacity:0;pointer-events:none;">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+          <mat-error *ngIf="email?.invalid && email?.touched">Please enter a valid email.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Mobile Number</mat-label>
+          <mat-icon matPrefix>phone</mat-icon>
+          <input matInput formControlName="phone" type="tel" maxlength="10" placeholder="Enter your mobile number" required>
+          <!-- Invisible matSuffix for alignment -->
+          <button mat-icon-button matSuffix type="button" style="opacity:0;pointer-events:none;">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+          <mat-error *ngIf="phone?.invalid && phone?.touched">Enter a valid 10-digit mobile number.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Password</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Create a password" required (input)="onPasswordInput()">
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="password?.invalid && password?.touched">Password must be at least 8 characters and strong.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Confirm Password</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter your password" required>
+          <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="hideConfirmPassword ? 'Show password' : 'Hide password'">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="signupForm.hasError('passwordsMismatch') && confirmPassword?.touched">Passwords do not match.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>Business/Company Name</mat-label>
+          <mat-icon matPrefix>business</mat-icon>
+          <input matInput formControlName="businessName" placeholder="(Optional)">
+          <!-- Invisible matSuffix for alignment -->
+          <button mat-icon-button matSuffix type="button" style="opacity:0;pointer-events:none;">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
+          <mat-label>House/Property Name</mat-label>
+          <mat-icon matPrefix>home</mat-icon>
+          <input matInput formControlName="propertyName" placeholder="Enter your property name" required>
+          <!-- Invisible matSuffix for alignment -->
+          <button mat-icon-button matSuffix type="button" style="opacity:0;pointer-events:none;">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+          <mat-error *ngIf="propertyName?.invalid && propertyName?.touched">Property name is required.</mat-error>
+        </mat-form-field>
+        <mat-checkbox formControlName="terms" class="mb-3">I agree to the <a href="#" target="_blank">Terms & Conditions</a></mat-checkbox>
+        <button mat-raised-button color="primary" class="w-100 signup-btn" type="submit">Sign Up</button>
+      </form>
+      <div class="login-link text-center mt-3">
+        Already have an account?
+        <a routerLink="/login">Login</a>
+      </div>
+    </mat-card>
+  </div>
+</div>

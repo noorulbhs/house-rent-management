@@ -1,0 +1,13 @@
+<mat-toolbar color="primary" class="dashboard-toolbar">
+  <span class="logo"><mat-icon>home</mat-icon> Rent Management</span>
+  <span class="spacer"></span>
+  <span class="owner-name" [class.hide-on-mobile]="isMobile">Hi, {{ ownerName }} 👋</span>
+  <ng-content select="app-notification"></ng-content>
+  <app-user-icon
+    [isMobile]="isMobile"
+    [showUserDropdown]="showUserDropdown"
+    [ownerName]="ownerName"
+    [toggleUserDropdown]="toggleUserDropdown"
+    [closeUserDropdown]="closeUserDropdown">
+  </app-user-icon>
+</mat-toolbar>

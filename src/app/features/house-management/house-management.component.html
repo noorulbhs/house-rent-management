@@ -1,0 +1,51 @@
+<div class="house-management-root">
+  <h1 class="dashboard-heading">House Management</h1>
+  <button class="fab-add-btn" (click)="openAddForm()" aria-label="Add House">
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <div *ngIf="showForm" class="modal-overlay fancy-blur">
+    <div class="modal-dialog fancy-modal">
+      <div class="modal-header-gradient d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="modal-header-icon">home</mat-icon>
+          <span class="modal-title">{{ isEdit ? 'Edit House' : 'Add House' }}</span>
+        </div>
+        <button mat-icon-button class="modal-close-btn" (click)="cancelForm()" aria-label="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <form (ngSubmit)="saveHouse()" #houseForm="ngForm" autocomplete="off" class="modal-form-content">
+        <mat-form-field appearance="fill" class="w-100 mb-3 rounded-input">
+          <mat-label>Name</mat-label>
+          <input matInput type="text" [(ngModel)]="formHouse.name" name="name" required />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-100 mb-3 rounded-input">
+          <mat-label>Address</mat-label>
+          <input matInput type="text" [(ngModel)]="formHouse.address" name="address" required />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-100 mb-3 rounded-input">
+          <mat-label>Rooms</mat-label>
+          <input matInput type="number" [(ngModel)]="formHouse.rooms" name="rooms" min="1" required />
+        </mat-form-field>
+        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+          <button mat-flat-button color="primary" type="submit" [disabled]="!houseForm.form.valid" class="modal-action-btn">{{ isEdit ? 'Update' : 'Add' }}</button>
+          <button mat-stroked-button color="basic" type="button" (click)="cancelForm()" class="modal-action-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="houses.length === 0 && !showForm">No houses found.</div>
+  <ul *ngIf="houses.length > 0" class="house-list">
+    <li *ngFor="let house of houses; let i = index" class="house-item clickable" (click)="goToRooms(house)">
+      <div class="house-title">{{ house.name }}</div>
+      <div class="house-address">{{ house.address }}</div>
+      <div class="house-rooms">Rooms: {{ house.rooms }}</div>
+       <div class="house-actions top-right">
+        <button title="Edit" (click)="openEditForm(house, i)"><span class="material-icons">edit</span></button>
+        <button title="Delete" (click)="deleteHouse(house)"><span class="material-icons">delete</span></button>
+      </div>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,98 @@
+<div class="room-management-root">
+  <h1 class="dashboard-heading">Room Management</h1>
+
+  <button class="add-btn fab" (click)="openAddRoom()" title="Add Room">
+    <span class="material-icons">add</span>
+  </button>
+
+  <div *ngIf="showForm" class="modal-overlay fancy-blur">
+    <div class="modal-dialog fancy-modal">
+      <div class="modal-header-gradient d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons modal-header-icon">meeting_room</span>
+          <span class="modal-title">{{ isEditMode ? 'Edit Room' : 'Add Room' }}</span>
+        </div>
+        <button class="modal-close-btn" (click)="cancelForm()" aria-label="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <form (ngSubmit)="saveRoom()" #roomForm="ngForm" autocomplete="off" class="modal-form-content">
+        <div class="form-group">
+          <label>Room Number</label>
+          <input class="form-control" [(ngModel)]="formRoom.roomNumber" name="roomNumber" required />
+        </div>
+        <div class="form-group">
+          <label>Room Type</label>
+          <select class="form-control" [(ngModel)]="formRoom.roomType" name="roomType">
+            <option value="SINGLE">Single</option>
+            <option value="DOUBLE">Double</option>
+            <option value="TRIPLE">Triple</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Capacity</label>
+          <input class="form-control" type="number" [(ngModel)]="formRoom.capacity" name="capacity" min="1" required />
+        </div>
+        <div class="form-group">
+          <label>Rent Amount</label>
+          <input class="form-control" type="number" [(ngModel)]="formRoom.rentAmount" name="rentAmount" min="0" required />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="formRoom.status" name="status">
+            <option value="AVAILABLE">Available</option>
+            <option value="OCCUPIED">Occupied</option>
+            <option value="MAINTENANCE">Maintenance</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="allMode">
+          <label>House</label>
+          <select class="form-control" [(ngModel)]="formRoom.houseId" name="houseId" required>
+            <option [ngValue]="null" disabled selected *ngIf="!formRoom.houseId">Select House</option>
+            <option *ngFor="let house of availableHouses" [ngValue]="house.id">
+              {{ house.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-error" *ngIf="formError">{{ formError }}</div>
+        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+          <button class="modal-action-btn btn btn-success" type="submit" [disabled]="!roomForm.form.valid">{{ isEditMode ? 'Update' : 'Add' }}</button>
+          <button class="modal-action-btn btn btn-secondary" type="button" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="houseId">
+    <div *ngIf="rooms.length === 0" class="text-muted">No rooms found for this house.</div>
+    <ul *ngIf="rooms.length > 0" class="room-list">
+      <li *ngFor="let room of rooms" class="room-item">
+        <div class="room-title">Room {{ room.roomNumber }} ({{ room.roomType }})</div>
+        <div class="room-details">
+          House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Capacity: {{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
+        </div>
+        <div class="room-status">Status: {{ room.status }}</div>
+        <div class="room-actions top-right">
+          <button class="icon-btn" title="Edit" (click)="$event.stopPropagation(); openEditRoom(room)"><span class="material-icons">edit</span></button>
+          <button class="icon-btn" title="Delete" (click)="$event.stopPropagation(); deleteRoom(room)"><span class="material-icons">delete</span></button>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="!houseId">
+    <div *ngIf="rooms.length === 0" class="text-muted">No rooms found for your houses.</div>
+    <ul *ngIf="rooms.length > 0" class="room-list">
+      <li *ngFor="let room of rooms" class="room-item">
+        <div class="room-title">Room {{ room.roomNumber }} ({{ room.roomType }})</div>
+        <div class="room-details">
+          House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Capacity: {{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
+        </div>
+        <div class="room-status">Status: {{ room.status }}</div>
+        <div class="room-actions top-right">
+          <button class="icon-btn" title="Edit" (click)="$event.stopPropagation(); openEditRoom(room)"><span class="material-icons">edit</span></button>
+          <button class="icon-btn" title="Delete" (click)="$event.stopPropagation(); deleteRoom(room)"><span class="material-icons">delete</span></button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

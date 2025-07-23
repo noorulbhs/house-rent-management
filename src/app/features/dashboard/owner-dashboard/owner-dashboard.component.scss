@@ -1,3 +1,86 @@
+/* Container for header and overdue indicator */
+.rent-due-card-header-container {
+  position: relative;
+  width: 100%;
+  min-height: 2.2rem;
+}
+
+/* Overdue indicator absolutely positioned to right of header */
+.overdue-indicator-absolute {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  color: #b71c1c;
+  font-weight: 700;
+  font-size: 1.05rem;
+  background: #fff3f3;
+  border-radius: 12px;
+  padding: 0.18rem 0.65rem 0.18rem 0.38rem;
+  box-shadow: 0 1px 6px rgba(183,28,28,0.08);
+  z-index: 10;
+}
+/* Rent Due Cards Grid */
+.rent-due-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.rent-due-card {
+  box-shadow: 0 2px 12px rgba(63,81,181,0.10);
+  border-radius: 16px;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+}
+.rent-due-card:hover {
+  box-shadow: 0 4px 24px rgba(63,81,181,0.18);
+}
+
+.rent-due-card-header {
+  display: flex;
+  align-items: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #3f51b5;
+}
+.student-name {
+  margin-left: 0.5rem;
+}
+.rent-due-card-details {
+  width: 100%;
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+.due-status {
+  color: #b71c1c;
+  font-weight: 600;
+}
+.partial-status {
+  color: #ff9800;
+  font-weight: 600;
+}
+.no-dues-text {
+  grid-column: 1/-1;
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
 @media (max-width: 768px) {
   .dashboard-heading {
     padding-left: 16px;
@@ -251,9 +334,11 @@
 // Main Content
 .dashboard-content {
   display: flex;
-  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
   background: transparent;
   margin: 24px 16px 0 16px;
+  overflow-y: auto;
+  padding-bottom: 2.5rem;
 }
 .dashboard-sidenav-container {
   width: 100%;

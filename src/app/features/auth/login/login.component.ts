@@ -35,6 +35,10 @@ export class LoginComponent {
     this.router.navigate(['/owner-signup']);
   }
 
+  navigateToForgotPassword() {
+    this.router.navigate(['/forgot-password']);
+  }
+
   constructor(
     private fb: FormBuilder,
     private mockAuthService: MockAuthService,
@@ -64,7 +68,16 @@ export class LoginComponent {
           console.log('Login success, user object:', user);
           localStorage.setItem('currentUser', JSON.stringify(user));
           this.toastr.success('Login successful!', 'Success');
-          this.router.navigate(['/owner-dashboard']);
+          // Navigate based on user role
+          if (user.role === 'OWNER') {
+            this.router.navigate(['/owner-dashboard']);
+          } else if (user.role === 'STUDENT') {
+            this.router.navigate(['/student-dashboard']);
+          } else if (user.role === 'ADMIN') {
+            this.router.navigate(['/admin-dashboard']);
+          } else {
+            this.router.navigate(['/']); // fallback
+          }
         } else {
           this.loginError = 'Invalid email or password';
           this.toastr.error('Invalid email or password', 'Login Failed');

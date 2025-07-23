@@ -24,13 +24,19 @@
     <mat-sidenav-container class="dashboard-sidenav-container">
       <mat-sidenav #sidenav [mode]="sidenavMode" [opened]="sidenavOpened" class="dashboard-sidenav" (closedStart)="sidenavOpened = false" (backdropClick)="sidenav.close()">
         <mat-nav-list>
-          <a mat-list-item routerLink="/owner-dashboard" (click)="isMobile ? sidenav.close() : null"><mat-icon>dashboard</mat-icon> Dashboard</a>
-          <a mat-list-item routerLink="/house-management" (click)="isMobile ? sidenav.close() : null"><mat-icon>home</mat-icon> Houses</a>
-          <a mat-list-item routerLink="/rooms" (click)="isMobile ? sidenav.close() : null"><mat-icon>meeting_room</mat-icon> Rooms</a>
-          <a mat-list-item routerLink="/students" (click)="isMobile ? sidenav.close() : null"><mat-icon>people</mat-icon> Students</a>
-          <a mat-list-item routerLink="/rent" (click)="isMobile ? sidenav.close() : null"><mat-icon>payments</mat-icon> Rent</a>
-          <a mat-list-item routerLink="/reports" (click)="isMobile ? sidenav.close() : null"><mat-icon>bar_chart</mat-icon> Reports</a>
+          <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.route" (click)="isMobile ? sidenav.close() : null">
+            <mat-icon>{{ item.icon }}</mat-icon> {{ item.label }}
+          </a>
         </mat-nav-list>
+        <mat-divider></mat-divider>
+        <div class="sidebar-quick-actions">
+          <span class="quick-actions-title">Quick Actions</span>
+          <div class="quick-actions-list">
+            <button mat-stroked-button color="primary" *ngFor="let action of quickActions" (click)="onQuickAction(action)">
+              <mat-icon>{{ action.icon }}</mat-icon> {{ action.label }}
+            </button>
+          </div>
+        </div>
       </mat-sidenav>
       <mat-sidenav-content>
         <router-outlet></router-outlet>

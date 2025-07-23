@@ -35,6 +35,15 @@ export class OwnerSignupComponent {
   hideConfirmPassword = true;
   passwordStrength = 0;
 
+  // Validator for confirmPassword to match password
+  matchPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    if (!this.signupForm) return null;
+    const password = this.signupForm?.get('password')?.value;
+    const confirm = control.value;
+    if (!confirm) return null;
+    return password === confirm ? null : { passwordMismatch: true };
+  }
+
   constructor(
     private fb: FormBuilder,
     private toastr: ToastrService,
@@ -46,11 +55,11 @@ export class OwnerSignupComponent {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       password: ['', [Validators.required, this.passwordStrengthValidator]],
-      confirmPassword: ['', [Validators.required]],
+      confirmPassword: ['', [Validators.required, this.matchPasswordValidator.bind(this)]],
       businessName: [''],
       propertyName: ['', [Validators.required]],
       terms: [false, [Validators.requiredTrue]]
-    }, { validators: this.passwordsMatchValidator });
+    }, { validators: this.passwordsMatchValidator, updateOn: 'change' });
   }
 
   get fullName() { return this.signupForm.get('fullName'); }
@@ -76,7 +85,11 @@ export class OwnerSignupComponent {
   passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirm = group.get('confirmPassword')?.value;
-    return password === confirm ? null : { passwordsMismatch: true };
+    if (password === confirm) {
+      return null;
+    } else {
+      return { passwordsMismatch: true };
+    }
   }
 
   onPasswordInput() {

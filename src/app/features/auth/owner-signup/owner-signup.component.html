@@ -45,20 +45,22 @@
         <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
           <mat-label>Password</mat-label>
           <mat-icon matPrefix>lock</mat-icon>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Create a password" required (input)="onPasswordInput()">
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Create a password" required>
           <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          <mat-error *ngIf="password?.invalid && password?.touched">Password must be at least 8 characters and strong.</mat-error>
         </mat-form-field>
+        <div *ngIf="password?.invalid && password?.touched" class="password-error-text">
+          Password must be at least 8 characters and strong.
+        </div>
         <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
           <mat-label>Confirm Password</mat-label>
           <mat-icon matPrefix>lock</mat-icon>
-          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter your password" required>
+          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter your password" required (input)="signupForm.updateValueAndValidity()">
           <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="hideConfirmPassword ? 'Show password' : 'Hide password'">
             <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
-          <mat-error *ngIf="signupForm.hasError('passwordsMismatch') && confirmPassword?.touched">Passwords do not match.</mat-error>
+          <mat-error *ngIf="signupForm.hasError('passwordsMismatch') && password?.value && confirmPassword?.value">Passwords do not match.</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline" class="w-100 mb-3 modern-input">
           <mat-label>Business/Company Name</mat-label>
@@ -80,7 +82,7 @@
           <mat-error *ngIf="propertyName?.invalid && propertyName?.touched">Property name is required.</mat-error>
         </mat-form-field>
         <mat-checkbox formControlName="terms" class="mb-3">I agree to the <a href="#" target="_blank">Terms & Conditions</a></mat-checkbox>
-        <button mat-raised-button color="primary" class="w-100 signup-btn" type="submit">Sign Up</button>
+        <button mat-raised-button color="primary" class="w-100 signup-btn" type="submit" [disabled]="signupForm.invalid">Sign Up</button>
       </form>
       <div class="login-link text-center mt-3">
         Already have an account?

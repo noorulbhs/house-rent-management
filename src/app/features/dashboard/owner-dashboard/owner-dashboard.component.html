@@ -6,3 +6,47 @@
     <div class="summary-value">{{ item.value }}</div>
   </mat-card>
 </div>
+
+<!-- Upcoming Rent Dues List -->
+<div class="upcoming-rent-dues-section">
+  <h2 class="section-title">Upcoming Rent Dues</h2>
+  <div class="rent-due-cards-grid">
+    <mat-card class="rent-due-card" *ngFor="let due of upcomingRentDues">
+      <div class="rent-due-card-header-container">
+        <div class="rent-due-card-header">
+          <mat-icon color="primary">person</mat-icon>
+          <span class="student-name">{{ due.studentName }}</span>
+        </div>
+        <span *ngIf="isOverdue(due.dueDate)" class="overdue-indicator-absolute">
+          <mat-icon color="warn">error</mat-icon>
+          <span class="overdue-text">Overdue!</span>
+        </span>
+      </div>
+      <div class="rent-due-card-details">
+        <div class="detail-row">
+          <mat-icon>meeting_room</mat-icon>
+          <span>Room <strong>{{ due.roomNumber }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <mat-icon>home</mat-icon>
+          <span>{{ due.houseName }}</span>
+        </div>
+        <div class="detail-row">
+          <mat-icon>event</mat-icon>
+          <span>Due: <strong>{{ due.dueDate | date:'mediumDate' }}</strong></span>
+        </div>
+<!-- Add today variable to component for comparison -->
+        <div class="detail-row">
+          <mat-icon color="accent">payments</mat-icon>
+          <span>Amount: <strong>₹{{ due.amount }}</strong></span>
+        </div>
+        <div class="detail-row">
+          <mat-icon [color]="due.status === 'DUE' ? 'warn' : 'accent'">info</mat-icon>
+          <span>Status: <span [ngClass]="{'due-status': due.status === 'DUE', 'partial-status': due.status === 'PARTIAL'}">{{ due.status }}</span></span>
+        </div>
+      </div>
+    </mat-card>
+    <div *ngIf="upcomingRentDues.length === 0" class="no-dues-text">No upcoming rent dues.</div>
+  </div>
+  <div *ngIf="upcomingRentDues.length === 0" class="no-dues-text">No upcoming rent dues.</div>
+</div>

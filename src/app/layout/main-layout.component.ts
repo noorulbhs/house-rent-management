@@ -1,3 +1,4 @@
+// ...existing code...
 import { Component, ViewChild, Inject, Optional, PLATFORM_ID } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
@@ -13,6 +14,7 @@ import { HeaderComponent } from './header.component';
 import { NotificationComponent } from './notification.component';
 import { UserIconComponent } from './user-icon.component';
 import { MockDashboardService } from '../service/mock-dashboard.service';
+import { MOCK_MENU_ITEMS, MOCK_QUICK_ACTIONS, MenuItem } from '../mock-data/mock-menu';
 
 @Component({
   selector: 'app-main-layout',
@@ -41,6 +43,8 @@ export class MainLayoutComponent {
   showUserDropdown = false;
   ownerName = '';
   alerts: Array<{ message: string; type: string }> = [];
+  menuItems: MenuItem[] = MOCK_MENU_ITEMS;
+  quickActions: MenuItem[] = MOCK_QUICK_ACTIONS;
 
   constructor(
     @Optional() private breakpointObserver: BreakpointObserver,
@@ -90,5 +94,10 @@ export class MainLayoutComponent {
 
   closeUserDropdown() {
     this.showUserDropdown = false;
+  }
+
+  onQuickAction(action: MenuItem) {
+    // Implement action logic here (e.g., open modal, navigate, etc.)
+    alert(`Quick Action: ${action.label}`);
   }
 }

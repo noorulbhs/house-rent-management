@@ -1,4 +1,29 @@
 @use '../features/dashboard/owner-dashboard/owner-dashboard.component.scss' as *;
+/* Make dashboard content scrollable in mobile view */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-sidenav-container {
+  flex: 1 1 auto;
+}
+
+.dashboard-scrollable-content {
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-content {
+    /* No fixed height */
+  }
+  .dashboard-sidenav-container {
+    /* No fixed height */
+  }
+  .dashboard-scrollable-content {
+    padding-bottom: 1.5rem;
+  }
+}
 /* Sidebar Quick Actions Styles */
 .sidebar-quick-actions {
   margin-top: 2rem;

@@ -36,16 +36,96 @@
     </div>
   </div>
 
-  <div *ngIf="houses.length === 0 && !showForm">No houses found.</div>
-  <ul *ngIf="houses.length > 0" class="house-list">
-    <li *ngFor="let house of houses; let i = index" class="house-item clickable" (click)="goToRooms(house)">
-      <div class="house-title">{{ house.name }}</div>
+  <!-- Filter/Search Bar -->
+  <div class="house-filter-bar d-flex gap-2" *ngIf="!showForm">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Search by Name/Code</mat-label>
+      <input matInput [(ngModel)]="searchText" (ngModelChange)="applyFilters()" placeholder="Type to search..." />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>City</mat-label>
+      <mat-select [(ngModel)]="selectedCity" (selectionChange)="applyFilters()">
+        <mat-option value="">All Cities</mat-option>
+        <mat-option *ngFor="let city of availableCities" [value]="city">{{ city }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="view-toggle-bar d-flex gap-2 mb-3" *ngIf="filteredHouses.length > 0 && !showForm">
+    <button mat-stroked-button color="primary" [disabled]="viewMode === 'grid'" (click)="setViewMode('grid')">
+      <mat-icon>grid_view</mat-icon> Grid View
+    </button>
+    <button mat-stroked-button color="primary" [disabled]="viewMode === 'table'" (click)="setViewMode('table')">
+      <mat-icon>table_chart</mat-icon> Table View
+    </button>
+  </div>
+  <div *ngIf="filteredHouses.length === 0 && !showForm">No houses found.</div>
+  <ul *ngIf="filteredHouses.length > 0 && viewMode === 'grid'" class="house-list">
+    <li *ngFor="let house of filteredHouses; let i = index" class="house-item clickable" (click)="goToRooms(house)">
+      <div class="house-title">{{ house.name }}
+        <span class="house-status-chip" [ngClass]="getHouseStatus(house.id).toLowerCase()">
+          {{ getHouseStatus(house.id) }}
+        </span>
+      </div>
       <div class="house-address">{{ house.address }}</div>
       <div class="house-rooms">Rooms: {{ house.rooms }}</div>
-       <div class="house-actions top-right">
+      <!-- Occupancy Bar -->
+      <div class="house-occupancy-bar">
+        <span>Occupancy:</span>
+        <div class="occupancy-bar-root">
+          <div class="occupancy-bar-fill" [style.width]="(getOccupiedRooms(house.id) / getTotalRooms(house) * 100) + '%'">
+          </div>
+        </div>
+        <span class="occupancy-label">{{ getOccupiedRooms(house.id) }}/{{ getTotalRooms(house) }} occupied</span>
+      </div>
+      <!-- Rent Summary -->
+      <div class="house-rent-summary">
+        <mat-icon class="rent-icon">payments</mat-icon>
+        <span>Total Rent: ₹{{ getHouseRent(house.id) }}</span>
+      </div>
+      <!-- Next Rent Due -->
+      <div class="house-next-rent">
+        <mat-icon class="next-rent-icon">event</mat-icon>
+        <span>Next Rent Due: {{ getNextRentDue(house.id) }}</span>
+      </div>
+      <div class="house-actions top-right">
         <button title="Edit" (click)="openEditForm(house, i)"><span class="material-icons">edit</span></button>
+        <button title="Duplicate" (click)="$event.stopPropagation(); duplicateHouse(house)"><span class="material-icons">content_copy</span></button>
         <button title="Delete" (click)="deleteHouse(house)"><span class="material-icons">delete</span></button>
       </div>
     </li>
   </ul>
+  <table *ngIf="filteredHouses.length > 0 && viewMode === 'table'" class="house-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Address</th>
+        <th>Rooms</th>
+        <th>Occupancy</th>
+        <th>Total Rent</th>
+        <th>Next Rent Due</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let house of filteredHouses; let i = index">
+        <td>{{ house.name }}</td>
+        <td>
+          <span class="house-status-chip" [ngClass]="getHouseStatus(house.id).toLowerCase()">
+            {{ getHouseStatus(house.id) }}
+          </span>
+        </td>
+        <td>{{ house.address }}</td>
+        <td>{{ house.rooms }}</td>
+        <td>{{ getOccupiedRooms(house.id) }}/{{ getTotalRooms(house) }} occupied</td>
+        <td>₹{{ getHouseRent(house.id) }}</td>
+        <td>{{ getNextRentDue(house.id) }}</td>
+        <td>
+          <button title="Edit" (click)="openEditForm(house, i)"><span class="material-icons">edit</span></button>
+          <button title="Duplicate" (click)="$event.stopPropagation(); duplicateHouse(house)"><span class="material-icons">content_copy</span></button>
+          <button title="Delete" (click)="deleteHouse(house)"><span class="material-icons">delete</span></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

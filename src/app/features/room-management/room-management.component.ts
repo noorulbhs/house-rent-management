@@ -1,6 +1,14 @@
+// ...existing code...
+import { MockStudentService } from '../../features/student-management/mock-student.service';
+import { Student } from '../../features/student-management/mock-students';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MockRoomService } from '../../service/mock-room.service';
 import { Room } from '../../mock-data/mock-rooms';
@@ -10,11 +18,41 @@ import { AuthService } from '../../core/auth.service';
 @Component({
   selector: 'app-room-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule, MatButtonModule],
   templateUrl: './room-management.component.html',
   styleUrl: './room-management.component.scss'
 })
 export class RoomManagementComponent implements OnInit {
+isTableView: boolean = false; // Only one toggle property should exist
+// ...existing code...
+  openAddStudentModal() {
+    // TODO: Implement add student modal or navigation
+    alert('Add Student modal would open here.');
+  }
+  // Filter/search state
+  searchText: string = '';
+  selectedType: string = '';
+  selectedStatus: string = '';
+  filteredRooms: Room[] = [];
+
+  // For expandable student list in room card
+  showStudents: { [roomId: string]: boolean } = {};
+
+  // Get students assigned to a room
+  getStudentsForRoom(roomId: string): Student[] {
+    if (!this.allStudents || this.allStudents.length === 0) return [];
+    return this.allStudents.filter(s => s.roomId === roomId);
+  }
+
+  applyFilters() {
+    this.filteredRooms = this.rooms.filter(room => {
+      const matchesText = this.searchText === '' || (room.roomNumber + '').toLowerCase().includes(this.searchText.toLowerCase());
+      const matchesType = this.selectedType === '' || room.roomType === this.selectedType;
+      const matchesStatus = this.selectedStatus === '' || room.status === this.selectedStatus;
+      return matchesText && matchesType && matchesStatus;
+    });
+  }
+
   houseNameMap: { [houseId: string]: string } = {};
   houseId: string | null = null;
   rooms: Room[] = [];
@@ -25,12 +63,58 @@ export class RoomManagementComponent implements OnInit {
   formRoom: any = {};
   formError = '';
 
+  // Assign student modal state
+  showAssignModal = false;
+  assignRoomId: string | null = null;
+  selectedStudentId: string = '';
+  assignError: string = '';
+  availableStudents: Student[] = [];
+  allStudents: Student[] = [];
+  isLoadingStudents = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private roomService: MockRoomService,
-    private authService: AuthService
+    private authService: AuthService,
+    private studentService: MockStudentService
   ) {}
+  openAssignStudent(roomId: string) {
+    this.assignRoomId = roomId;
+    this.selectedStudentId = '';
+    this.assignError = '';
+    this.showAssignModal = true;
+    this.isLoadingStudents = true;
+    this.studentService.getStudents().subscribe(students => {
+      this.availableStudents = students.filter(s => !s.roomId || s.roomId === '');
+      this.isLoadingStudents = false;
+    });
+  }
+
+  cancelAssignStudent() {
+    this.showAssignModal = false;
+    this.assignRoomId = null;
+    this.selectedStudentId = '';
+    this.assignError = '';
+  }
+
+  confirmAssignStudent() {
+    if (!this.selectedStudentId || !this.assignRoomId) {
+      this.assignError = 'Please select a student.';
+      return;
+    }
+    this.studentService.getStudentById(this.selectedStudentId).subscribe(student => {
+      if (student) {
+        const updated = { ...student, roomId: this.assignRoomId ? this.assignRoomId.toString() : '' };
+        this.studentService.updateStudent(updated).subscribe(() => {
+          this.showAssignModal = false;
+          this.assignRoomId = null;
+          this.selectedStudentId = '';
+          this.assignError = '';
+        });
+      }
+    });
+  }
   goToRoomStudents(roomId: string) {
     console.log('[RoomManagement] Navigating to students for roomId:', roomId);
     this.router.navigate(['/students'], { queryParams: { roomId } });
@@ -41,6 +125,7 @@ export class RoomManagementComponent implements OnInit {
     if (!this.houseId) return;
     this.roomService.getRoomsByHouse(this.houseId).subscribe((rooms: Room[]) => {
       this.rooms = rooms;
+      this.applyFilters();
     });
   }
 
@@ -49,10 +134,12 @@ export class RoomManagementComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     if (!user) {
       this.rooms = [];
+      this.applyFilters();
       return;
     }
     this.roomService.getAllRoomsByOwner(Number(user.id)).subscribe((rooms: Room[]) => {
       this.rooms = rooms;
+      this.applyFilters();
     });
   }
 
@@ -65,6 +152,10 @@ export class RoomManagementComponent implements OnInit {
 
   ngOnInit() {
     this.buildHouseNameMap();
+    // Load all students for room card display
+    this.studentService.getStudents().subscribe(students => {
+      this.allStudents = students;
+    });
     this.route.paramMap.subscribe(params => {
       this.houseId = params.get('houseId');
       this.allMode = !this.houseId;

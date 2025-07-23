@@ -1,6 +1,41 @@
 <div class="room-management-root">
   <h1 class="dashboard-heading">Room Management</h1>
 
+  <!-- Filter/Search Bar -->
+  <div class="house-filter-bar d-flex gap-2" *ngIf="!showForm">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Search by Room Number</mat-label>
+      <input matInput [(ngModel)]="searchText" (ngModelChange)="applyFilters()" placeholder="Type to search..." />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Room Type</mat-label>
+      <mat-select [(ngModel)]="selectedType" (selectionChange)="applyFilters()">
+        <mat-option value="">All Types</mat-option>
+        <mat-option value="SINGLE">Single</mat-option>
+        <mat-option value="DOUBLE">Double</mat-option>
+        <mat-option value="TRIPLE">Triple</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+        <mat-option value="">All Status</mat-option>
+        <mat-option value="AVAILABLE">Available</mat-option>
+        <mat-option value="OCCUPIED">Occupied</mat-option>
+        <mat-option value="MAINTENANCE">Maintenance</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  
+  <div class="view-toggle-bar d-flex gap-2 mb-3">
+    <button mat-stroked-button color="primary" [disabled]="!isTableView" (click)="isTableView = false">
+      <mat-icon>grid_view</mat-icon> Grid View
+    </button>
+    <button mat-stroked-button color="primary" [disabled]="isTableView" (click)="isTableView = true">
+      <mat-icon>table_chart</mat-icon> Table View
+    </button>
+  </div>
+
   <button class="add-btn fab" (click)="openAddRoom()" title="Add Room">
     <span class="material-icons">add</span>
   </button>
@@ -64,24 +99,123 @@
     </div>
   </div>
 
+  <!-- Assign Student Modal -->
+  <div *ngIf="showAssignModal" class="modal-overlay fancy-blur">
+    <div class="modal-dialog fancy-modal" style="max-width: 420px; min-width: 340px;">
+          <div class="modal-header-gradient" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="modal-header-icon material-icons">person_add</span>
+              <span class="modal-title">Assign Student to Room</span>
+            </div>
+            <button class="modal-close-btn" (click)="cancelAssignStudent()" aria-label="Close">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+      <form (ngSubmit)="confirmAssignStudent()" autocomplete="off" class="modal-form-content">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;" *ngIf="assignRoomId">
+              <div class="room-summary mb-3">
+                <span class="material-icons" style="font-size:1.2rem;vertical-align:middle;color:#607d8b;">meeting_room</span>
+                <b>Room:</b> {{ assignRoomId }}
+              </div>
+              <button type="button" class="modal-action-btn btn btn-success" (click)="openAddStudentModal()">
+                <span class="material-icons" style="vertical-align: middle;">person_add</span> Add Student
+              </button>
+            </div>
+        <div class="form-group">
+              <label>Select Student</label>
+          <select class="form-control" [(ngModel)]="selectedStudentId" name="studentId" required>
+            <option value="" disabled selected>Select Student</option>
+            <option *ngFor="let student of availableStudents" [value]="student.id">
+              {{ student.name }} - {{ student.gender }} - DOB: {{ student.dob }} - {{ student.address }}
+            </option>
+          </select>
+        </div>
+        <div class="form-error" *ngIf="assignError" style="color:#b71c1c;font-weight:500;margin-top:0.5rem;">{{ assignError }}</div>
+        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+          <button class="modal-action-btn btn btn-success" type="submit">Assign</button>
+          <button class="modal-action-btn btn btn-secondary" type="button" (click)="cancelAssignStudent()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div>
     <div *ngIf="rooms.length === 0" class="text-muted">
       No rooms found.
     </div>
-    <ul *ngIf="rooms.length > 0" class="room-list">
-      <li *ngFor="let room of rooms" class="room-item clickable" (click)="goToRoomStudents(room.id)">
-        <div>
-          <div class="room-title">Room {{ room.roomNumber }} ({{ room.roomType }})</div>
-          <div class="room-details">
-            House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Capacity: {{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
-          </div>
-          <div class="room-status">Status: {{ room.status }}</div>
+    <div *ngIf="filteredRooms.length > 0">
+      <ng-container *ngIf="!isTableView; else tableView">
+        <ul class="room-list">
+          <li *ngFor="let room of filteredRooms" class="room-item clickable">
+            <!-- ...existing card view code... -->
+            <div class="room-card-top-row mb-2">
+              <div class="room-title">Room {{ room.roomNumber }} <span class="room-type-chip">{{ room.roomType }}</span>
+                <span class="room-status-chip ms-2" [ngClass]="room.status.toLowerCase()">{{ room.status }}</span>
+              </div>
+              <div class="room-actions d-flex gap-2">
+                <button class="icon-btn circle" title="Assign Student" (click)="$event.stopPropagation(); openAssignStudent(room.id)"><span class="material-icons">person_add</span></button>
+                <button class="icon-btn circle" title="Edit" (click)="$event.stopPropagation(); openEditRoom(room)"><span class="material-icons">edit</span></button>
+                <button class="icon-btn circle" title="Delete" (click)="$event.stopPropagation(); deleteRoom(room)"><span class="material-icons">delete</span></button>
+              </div>
+            </div>
+            <div class="room-details">
+              House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Capacity: {{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
+            </div>
+            <div class="room-actions-student-toggle" style="display:flex;align-items:center;justify-content:flex-end;gap:1rem;margin-top:0.5rem;">
+              <button class="student-toggle-btn" (click)="$event.stopPropagation(); showStudents[room.id] = !showStudents[room.id]">
+                <span class="material-icons student-toggle-icon">{{ showStudents[room.id] ? 'expand_less' : 'expand_more' }}</span>
+                <span>{{ showStudents[room.id] ? 'Hide Students' : 'Show Students' }}</span>
+              </button>
+            </div>
+            <div *ngIf="showStudents[room.id]" class="student-list-expand mt-2" style="background:#f5f7fa;border-radius:8px;padding:1rem 1.5rem 1rem 1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+              <div *ngIf="getStudentsForRoom(room.id).length === 0" class="text-muted student-list-empty">No students assigned.</div>
+              <ul *ngIf="getStudentsForRoom(room.id).length > 0" class="student-list">
+                <li *ngFor="let student of getStudentsForRoom(room.id)" class="student-list-item">
+                  <span class="material-icons student-list-person">person</span>
+                  <div class="student-list-details">
+                    <span class="student-list-name">{{ student.name }}</span>
+                    <span class="student-list-gender">({{ student.gender }})</span>
+                    <span class="student-list-dob">DOB: {{ student.dob }}</span>
+                    <span class="student-list-address">{{ student.address }}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </ng-container>
+      <ng-template #tableView>
+        <div class="room-table-wrapper" style="overflow-x:auto;">
+          <table class="room-table" style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <thead style="background:#e3f2fd;">
+              <tr>
+                <th style="padding:0.75rem 1rem;text-align:left;">Room #</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">Type</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">Status</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">House</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">Capacity</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">Rent</th>
+                <th style="padding:0.75rem 1rem;text-align:left;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let room of filteredRooms">
+                <td style="padding:0.75rem 1rem;">{{ room.roomNumber }}</td>
+                <td style="padding:0.75rem 1rem;">{{ room.roomType }}</td>
+                <td style="padding:0.75rem 1rem;"><span class="room-status-chip" [ngClass]="room.status.toLowerCase()">{{ room.status }}</span></td>
+                <td style="padding:0.75rem 1rem;">{{ houseNameMap[room.houseId] }}</td>
+                <td style="padding:0.75rem 1rem;">{{ room.capacity }}</td>
+                <td style="padding:0.75rem 1rem;">₹{{ room.rentAmount }}</td>
+                <td style="padding:0.75rem 1rem;">
+                  <button class="icon-btn circle" title="Assign Student" (click)="$event.stopPropagation(); openAssignStudent(room.id)"><span class="material-icons">person_add</span></button>
+                  <button class="icon-btn circle" title="Edit" (click)="$event.stopPropagation(); openEditRoom(room)"><span class="material-icons">edit</span></button>
+                  <button class="icon-btn circle" title="Delete" (click)="$event.stopPropagation(); deleteRoom(room)"><span class="material-icons">delete</span></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="room-actions top-right">
-          <button class="icon-btn" title="Edit" (click)="$event.stopPropagation(); openEditRoom(room)"><span class="material-icons">edit</span></button>
-          <button class="icon-btn" title="Delete" (click)="$event.stopPropagation(); deleteRoom(room)"><span class="material-icons">delete</span></button>
-        </div>
-      </li>
-    </ul>
+      </ng-template>
+    </div>
   </div>
 </div>

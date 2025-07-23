@@ -1,3 +1,335 @@
+/* Table view styles (fully synced with House Management) */
+.room-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.room-table th, .room-table td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e6ee;
+}
+.room-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #2e3a59;
+}
+.room-table tr:last-child td {
+  border-bottom: none;
+}
+.room-table td button {
+  margin-right: 0.5rem;
+  border: none;
+  background: #f5f7fa;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.room-table td button:hover {
+  background: #e3e6ee;
+}
+.room-table td .material-icons {
+  font-size: 20px;
+  color: #2e3a59;
+}
+.view-toggle-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+/* Status chip styles (fully synced) */
+.room-status-chip {
+  display: inline-block;
+  margin-left: 0.7rem;
+  padding: 0.18rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  background: #e3e6ee;
+  color: #2e3a59;
+  vertical-align: middle;
+  text-transform: capitalize;
+}
+.room-status-chip.full {
+  background: #b71c1c;
+  color: #fff;
+}
+.room-status-chip.available {
+  background: #43a047;
+  color: #fff;
+}
+.room-status-chip.maintenance {
+  background: #ffa000;
+  color: #fff;
+}
+.room-status-chip.mixed {
+  background: #3f51b5;
+  color: #fff;
+}
+/* Grid/Card view styles (fully synced) */
+.room-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0 0;
+}
+.room-item {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(63,81,181,0.08);
+  margin-bottom: 1.2rem;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.room-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2e3a59;
+}
+.room-details {
+  color: #607d8b;
+  font-size: 0.98rem;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.room-capacity {
+  color: #3f51b5;
+  font-size: 0.95rem;
+}
+.room-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+.room-actions button {
+  background: #e3e6ee;
+  color: #2e3a59;
+  border: none;
+  border-radius: 50%;
+  padding: 0.3rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.room-actions button:hover {
+  background: #c5cae9;
+}
+/* Table view styles from House Management */
+.room-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.room-table th, .room-table td {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e6ee;
+}
+.room-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #2e3a59;
+}
+.room-table tr:last-child td {
+  border-bottom: none;
+}
+.room-table td button {
+  margin-right: 0.5rem;
+  border: none;
+  background: #f5f7fa;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.room-table td button:hover {
+  background: #e3e6ee;
+}
+.room-table td .material-icons {
+  font-size: 20px;
+  color: #2e3a59;
+}
+.view-toggle-bar {
+  margin-bottom: 1rem;
+}
+/* Status chip styles from House Management */
+.room-status-chip {
+  display: inline-block;
+  margin-left: 0.7rem;
+  padding: 0.18rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  background: #e3e6ee;
+  color: #2e3a59;
+  vertical-align: middle;
+  text-transform: capitalize;
+}
+.room-status-chip.full {
+  background: #b71c1c;
+  color: #fff;
+}
+.room-status-chip.available {
+  background: #43a047;
+  color: #fff;
+}
+.assign-student-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.assign-student-modal-header .modal-action-btn {
+  margin-top: 0.1rem;
+  margin-bottom: 0;
+}
+.assign-student-select .mat-select-panel {
+  overflow-y: auto !important;
+  max-height: 220px !important;
+}
+.assign-student-select .mat-select-panel .mat-option {
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  display: block;
+  padding-right: 8px;
+}
+.fancy-modal {
+  max-width: 420px !important;
+  width: 100%;
+  overflow: hidden;
+}
+.cdk-overlay-pane .mat-select-panel {
+  max-width: 420px !important;
+  min-width: 260px !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  overflow-y: auto !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+}
+.cdk-overlay-pane .mat-select-panel .mat-option {
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  display: block;
+  padding-right: 8px;
+}
+.room-actions.d-flex {
+  display: flex;
+  gap: 0.7rem;
+}
+.room-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.room-title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+/* Ensure filter bar gap matches House Management and overrides lower specificity rules */
+.house-filter-bar.d-flex {
+  display: flex;
+  gap: 1.2rem !important;
+}
+.room-filter-bar {
+  background: #f5f7fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+  margin-bottom: 2rem;
+}
+.room-type-chip {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.12rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  background: #e3e6ee;
+  color: #2e3a59;
+  vertical-align: middle;
+  text-transform: capitalize;
+}
+.room-status-chip {
+  display: inline-block;
+  margin-top: 0;
+  margin-left: 0.7rem;
+  padding: 0.18rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  background: #e3e6ee;
+  color: #2e3a59;
+  vertical-align: middle;
+  text-transform: capitalize;
+}
+.room-status-chip.available {
+  background: #43a047;
+  color: #fff;
+}
+.room-status-chip.occupied {
+  background: #b71c1c;
+  color: #fff;
+}
+.room-status-chip.maintenance {
+  background: #ffa000;
+  color: #fff;
+}
+.icon-btn.circle {
+  background: #f5f7fa;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  transition: background 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.icon-btn.circle:hover {
+  background: #e3e6ee;
+}
+.icon-btn.circle .material-icons {
+  font-size: 20px;
+  color: #2e3a59;
+}
 .room-item.clickable {
   cursor: pointer;
   pointer-events: auto;
@@ -184,7 +516,7 @@
 }
 .form-actions.d-flex.gap-2.mt-4.justify-content-end {
   display: flex;
-  gap: 0.7rem;
+ gap: 1.2rem; // Match House Management filter bar gap
   margin-top: 1.5rem;
   justify-content: flex-start;
 }
@@ -222,4 +554,76 @@
 }
 .modal-action-btn.btn-secondary:hover {
   background: #e3e6ee !important;
+}
+// Room actions student toggle bar
+.room-actions-student-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.student-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  outline: none;
+}
+.student-toggle-btn:hover {
+  background: #bbdefb !important;
+  color: #0d47a1 !important;
+}
+.student-toggle-icon {
+  font-size: 1.3rem;
+  vertical-align: middle;
+}
+
+.student-list-expand {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.student-list-empty {
+  font-style: italic;
+}
+.student-list {
+  list-style: none;
+  padding-left: 0;
+}
+.student-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.student-list-person {
+  font-size: 1.3rem;
+  vertical-align: middle;
+  color: #1976d2;
+}
+.student-list-details {
+  flex: 1;
+}
+.student-list-name {
+  font-weight: 600;
+  color: #333;
+}
+.student-list-gender,
+.student-list-dob,
+.student-list-address {
+  color: #607d8b;
+  font-size: 0.95em;
+  margin-left: 0.5em;
 }

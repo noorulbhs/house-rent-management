@@ -1,1 +1,211 @@
-<p>payment-summary works!</p>
+<!-- Responsive Table/Card Layout -->
+  
+<div class="payment-summary-header d-flex align-items-center gap-2 mb-3">
+  <!-- <mat-icon color="primary" style="font-size:32px;vertical-align:middle;">payments</mat-icon> -->
+  <h2 class="payment-summary-title mb-3" style="margin:0;font-size:2rem;font-weight:400;color:#444;">Payment Summary</h2>
+<!-- End payment-summary-responsive -->
+<div class="payment-summary-filters d-flex gap-3 mb-3">
+  <mat-form-field appearance="outline" class="filter-input">
+    <mat-label>Month</mat-label>
+    <mat-select [(ngModel)]="filterMonth" (selectionChange)="applyFilters()">
+      <mat-option value="">All Months</mat-option>
+      <mat-option *ngFor="let m of months" [value]="m">{{ m }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="filter-input">
+    <mat-label>Status</mat-label>
+    <mat-select [(ngModel)]="filterStatus" (selectionChange)="applyFilters()">
+      <mat-option value="">All Status</mat-option>
+      <mat-option *ngFor="let s of statuses" [value]="s">{{ s }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="filter-input">
+    <mat-label>Search Student/Room</mat-label>
+    <input matInput [(ngModel)]="searchText" (ngModelChange)="applyFilters()" placeholder="Type to search..." />
+  </mat-form-field>
+</div>
+  <!-- Table for desktop/tablet -->
+  <table mat-table [dataSource]="filteredPayments" class="mat-elevation-z2 payment-table" *ngIf="!isMobile">
+    <thead>
+      <tr>
+        <th colspan="11" style="background:#f5f5f5;font-size:1.15rem;font-weight:500;padding:12px 0;text-align:left;border-radius:8px 8px 0 0;letter-spacing:0.5px;">Payment Summary Table</th>
+      </tr>
+    </thead>
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let p">
+        <mat-checkbox [checked]="selectedPayments.has(p.id)" (change)="toggleSelection(p.id)"></mat-checkbox>
+      </td>
+    </ng-container>
+    <!-- Student Column -->
+    <ng-container matColumnDef="studentName">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">person</mat-icon> Student</th>
+      <td mat-cell *matCellDef="let p">{{ p.studentName }}</td>
+    </ng-container>
+    <!-- House Column -->
+    <ng-container matColumnDef="house">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">home</mat-icon> House</th>
+      <td mat-cell *matCellDef="let p">{{ p.house || 'N/A' }}</td>
+    </ng-container>
+    <!-- Room Column -->
+    <ng-container matColumnDef="room">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">meeting_room</mat-icon> Room</th>
+      <td mat-cell *matCellDef="let p">{{ p.room }}</td>
+    </ng-container>
+    <!-- Month Column -->
+    <ng-container matColumnDef="month">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">calendar_month</mat-icon> Month</th>
+      <td mat-cell *matCellDef="let p">{{ p.month }}</td>
+    </ng-container>
+    <!-- Rent Column -->
+    <ng-container matColumnDef="rent">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">currency_rupee</mat-icon> Rent</th>
+      <td mat-cell *matCellDef="let p">₹{{ p.rent }}</td>
+    </ng-container>
+    <!-- Misc Charges Column -->
+    <ng-container matColumnDef="miscCharges">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">receipt</mat-icon> Misc</th>
+      <td mat-cell *matCellDef="let p">₹{{ p.miscCharges }}</td>
+    </ng-container>
+    <!-- Total Due Column -->
+    <ng-container matColumnDef="totalDue">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">attach_money</mat-icon> Total Due</th>
+      <td mat-cell *matCellDef="let p">₹{{ p.totalDue }}</td>
+    </ng-container>
+    <!-- Total Paid Column -->
+    <ng-container matColumnDef="totalPaid">
+      <th mat-header-cell *matHeaderCellDef><mat-icon style="font-size:18px;vertical-align:middle;">done</mat-icon> Total Paid</th>
+      <td mat-cell *matCellDef="let p">₹{{ p.totalPaid }}</td>
+    </ng-container>
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let p" class="status-cell">
+        <span class="status-chip" [ngClass]="p.status.toLowerCase()">{{ p.status }}</span>
+        <button mat-icon-button color="primary" *ngIf="p.status !== 'PAID' && !approvingId" (click)="inlineApprove(p.id)" title="Approve" style="margin-left:8px;vertical-align:middle;">
+          <mat-icon style="font-size:22px;vertical-align:middle;">check_circle</mat-icon>
+        </button>
+        <mat-spinner *ngIf="approvingId === p.id" diameter="22" style="vertical-align:middle;margin-left:8px;"></mat-spinner>
+      </td>
+    </ng-container>
+    <!-- Receipt Column -->
+    <ng-container matColumnDef="receipt">
+      <th mat-header-cell *matHeaderCellDef>Receipt</th>
+      <td mat-cell *matCellDef="let p" class="receipt-cell">
+        <a *ngIf="p.receiptUrl" [href]="p.receiptUrl" target="_blank" title="View Receipt" style="margin-right:8px;display:inline-flex;align-items:center;">
+          <mat-icon style="font-size:22px;color:#1976d2;vertical-align:middle;">receipt_long</mat-icon>
+        </a>
+        <button mat-icon-button color="accent" (click)="downloadInvoice(p)" title="Download Invoice PDF" style="vertical-align:middle;">
+          <mat-icon style="font-size:22px;vertical-align:middle;">picture_as_pdf</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['select','studentName','house','room','month','rent','miscCharges','totalDue','totalPaid','status','receipt']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['select','studentName','house','room','month','rent','miscCharges','totalDue','totalPaid','status','receipt'];"></tr>
+  </table>
+
+  <!-- Card layout for mobile -->
+  <div class="payment-card-list" *ngIf="isMobile">
+    <ng-container *ngFor="let p of filteredPayments">
+      <div class="payment-card mat-elevation-z2">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <input type="checkbox" [checked]="selectedPayments.has(p.id)" (change)="toggleSelection(p.id)" />
+          <span class="status-chip" [ngClass]="p.status.toLowerCase()">{{ p.status }}</span>
+          <button *ngIf="p.status !== 'PAID' && !approvingId" class="btn btn-sm btn-success" (click)="inlineApprove(p.id)" title="Approve" style="margin-left:8px;">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+          <mat-spinner *ngIf="approvingId === p.id" diameter="24"></mat-spinner>
+        </div>
+        <div><strong>Student:</strong> {{ p.studentName }}</div>
+        <div><strong>Room:</strong> {{ p.room }}</div>
+        <div><strong>Month:</strong> {{ p.month }}</div>
+        <div><strong>Rent:</strong> ₹{{ p.rent }}</div>
+        <div><strong>Misc:</strong> ₹{{ p.miscCharges }}</div>
+        <div><strong>Total Due:</strong> ₹{{ p.totalDue }}</div>
+        <div><strong>Total Paid:</strong> ₹{{ p.totalPaid }}</div>
+        <div>
+          <a *ngIf="p.receiptUrl" [href]="p.receiptUrl" target="_blank" title="View Receipt">
+            <mat-icon>receipt_long</mat-icon> View Receipt
+          </a>
+          <button class="btn btn-sm btn-accent" (click)="downloadInvoice(p)" title="Download Invoice PDF" style="margin-left:8px;">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+  <div class="action-btn-row mb-4">
+    <button mat-stroked-button color="primary" class="action-btn" (click)="selectAllVisible()">
+      <mat-icon class="action-btn-icon">select_all</mat-icon> Select All
+    </button>
+    <button mat-stroked-button color="warn" class="action-btn" (click)="clearSelection()">
+      <mat-icon class="action-btn-icon">clear</mat-icon> Clear
+    </button>
+    <button mat-raised-button color="accent" class="action-btn" [disabled]="selectedPayments.size === 0" (click)="bulkApprove()">
+      <mat-icon class="action-btn-icon">check_circle</mat-icon> Approve
+    </button>
+    <button mat-raised-button color="primary" class="action-btn" [disabled]="selectedPayments.size === 0" (click)="bulkExport()">
+      <mat-icon class="action-btn-icon">file_download</mat-icon> Export
+    </button>
+    <button mat-raised-button color="warn" class="action-btn" [disabled]="selectedPayments.size === 0" (click)="bulkSendReminders()">
+      <mat-icon class="action-btn-icon">notifications_active</mat-icon> Send Reminders
+    </button>
+    <span *ngIf="bulkActionMessage" style="margin-left:1rem;color:#388e3c;font-weight:500;">{{ bulkActionMessage }}</span>
+  </div>
+  <div class="add-payment-row d-flex justify-content-end mb-4">
+    <button mat-raised-button color="primary" class="add-payment-btn" (click)="openManualEntry()">
+      <mat-icon class="add-payment-icon">add_circle</mat-icon> Add Payment
+    </button>
+  </div>
+  <!-- Manual Entry Modal -->
+  <div *ngIf="showManualEntryModal" class="modal-overlay">
+    <div class="fancy-modal">
+      <div class="modal-header-gradient d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons modal-header-icon">payments</span>
+          <span class="modal-title">Add Payment</span>
+        </div>
+        <button class="modal-close-btn" (click)="showManualEntryModal = false" aria-label="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <form (ngSubmit)="saveManualPayment()" #manualPaymentForm="ngForm" autocomplete="off" class="modal-form-content">
+        <div class="form-group">
+          <label>Student Name</label>
+          <input class="form-control" [(ngModel)]="manualPayment.studentName" name="studentName" required />
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input class="form-control" type="number" [(ngModel)]="manualPayment.amount" name="amount" min="0" required />
+        </div>
+        <div class="form-group">
+          <label>Month</label>
+          <select class="form-control" [(ngModel)]="manualPayment.month" name="month" required>
+            <option value="" disabled selected>Select Month</option>
+            <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="manualPayment.status" name="status" required>
+            <option value="PAID">Paid</option>
+            <option value="PENDING">Pending</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>House</label>
+          <select class="form-control" [(ngModel)]="manualPayment.house" name="house" required>
+            <option value="" disabled selected>Select House</option>
+            <option *ngFor="let house of houses" [value]="house">{{ house }}</option>
+          </select>
+        </div>
+        <div class="form-error" *ngIf="manualError">{{ manualError }}</div>
+        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+          <button class="modal-action-btn btn btn-success" type="submit" [disabled]="!manualPaymentForm.form.valid">Add</button>
+          <button class="modal-action-btn btn btn-secondary" type="button" (click)="showManualEntryModal = false">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MockRoomService } from '../../service/mock-room.service';
 import { Room } from '../../mock-data/mock-rooms';
@@ -18,11 +19,18 @@ import { AuthService } from '../../core/auth.service';
 @Component({
   selector: 'app-room-management',
   standalone: true,
-imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule, MatButtonModule],
+imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './room-management.component.html',
   styleUrl: './room-management.component.scss'
 })
 export class RoomManagementComponent implements OnInit {
+  getOccupiedCount(room: Room): number {
+    return this.getStudentsForRoom(room.id).length;
+  }
+
+  isRoomFull(room: Room): boolean {
+    return this.getOccupiedCount(room) >= room.capacity;
+  }
 isTableView: boolean = false; // Only one toggle property should exist
 // ...existing code...
   openAddStudentModal() {
@@ -68,6 +76,7 @@ isTableView: boolean = false; // Only one toggle property should exist
   assignRoomId: string | null = null;
   selectedStudentId: string = '';
   assignError: string = '';
+  assignSuccess: string = '';
   availableStudents: Student[] = [];
   allStudents: Student[] = [];
   isLoadingStudents = false;
@@ -96,6 +105,7 @@ isTableView: boolean = false; // Only one toggle property should exist
     this.assignRoomId = null;
     this.selectedStudentId = '';
     this.assignError = '';
+    this.assignSuccess = '';
   }
 
   confirmAssignStudent() {
@@ -107,10 +117,14 @@ isTableView: boolean = false; // Only one toggle property should exist
       if (student) {
         const updated = { ...student, roomId: this.assignRoomId ? this.assignRoomId.toString() : '' };
         this.studentService.updateStudent(updated).subscribe(() => {
-          this.showAssignModal = false;
-          this.assignRoomId = null;
-          this.selectedStudentId = '';
-          this.assignError = '';
+          this.assignSuccess = 'Student assigned successfully!';
+          setTimeout(() => {
+            this.showAssignModal = false;
+            this.assignRoomId = null;
+            this.selectedStudentId = '';
+            this.assignError = '';
+            this.assignSuccess = '';
+          }, 1200);
         });
       }
     });

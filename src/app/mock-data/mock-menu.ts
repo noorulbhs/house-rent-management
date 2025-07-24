@@ -14,7 +14,7 @@ export const MOCK_MENU_ITEMS: MenuItem[] = [
   { id: 'houses', label: 'Houses', icon: 'home', route: '/house-management' },
   { id: 'rooms', label: 'Rooms', icon: 'meeting_room', route: '/rooms' },
   { id: 'students', label: 'Students', icon: 'people', route: '/students' },
-  { id: 'rent', label: 'Rent', icon: 'payments', route: '/rent' },
+  { id: 'payments', label: 'Payments', icon: 'payments', route: '/payments' },
   { id: 'reports', label: 'Reports', icon: 'bar_chart', route: '/reports' }
 ];
 

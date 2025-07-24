@@ -102,39 +102,46 @@
   <!-- Assign Student Modal -->
   <div *ngIf="showAssignModal" class="modal-overlay fancy-blur">
     <div class="modal-dialog fancy-modal" style="max-width: 420px; min-width: 340px;">
-          <div class="modal-header-gradient" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <span class="modal-header-icon material-icons">person_add</span>
-              <span class="modal-title">Assign Student to Room</span>
+      <div class="modal-header-gradient" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span class="modal-header-icon material-icons">person_add</span>
+          <span class="modal-title">Assign Student to Room</span>
+        </div>
+        <button class="modal-close-btn" (click)="cancelAssignStudent()" aria-label="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <form (ngSubmit)="confirmAssignStudent()" autocomplete="off" class="modal-form-content">
+        <div *ngIf="isLoadingStudents" class="d-flex justify-content-center align-items-center" style="min-height: 80px;">
+          <mat-spinner diameter="36" color="primary"></mat-spinner>
+        </div>
+        <ng-container *ngIf="!isLoadingStudents">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;" *ngIf="assignRoomId">
+            <div class="room-summary mb-3">
+              <span class="material-icons" style="font-size:1.2rem;vertical-align:middle;color:#607d8b;">meeting_room</span>
+              <b>Room:</b> {{ assignRoomId }}
             </div>
-            <button class="modal-close-btn" (click)="cancelAssignStudent()" aria-label="Close">
-              <span class="material-icons">close</span>
+            <button type="button" class="modal-action-btn btn btn-success" (click)="showForm = true; showAssignModal = false;">
+              <span class="material-icons" style="vertical-align: middle;">person_add</span> Add Student
             </button>
           </div>
-      <form (ngSubmit)="confirmAssignStudent()" autocomplete="off" class="modal-form-content">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;" *ngIf="assignRoomId">
-              <div class="room-summary mb-3">
-                <span class="material-icons" style="font-size:1.2rem;vertical-align:middle;color:#607d8b;">meeting_room</span>
-                <b>Room:</b> {{ assignRoomId }}
-              </div>
-              <button type="button" class="modal-action-btn btn btn-success" (click)="openAddStudentModal()">
-                <span class="material-icons" style="vertical-align: middle;">person_add</span> Add Student
-              </button>
-            </div>
-        <div class="form-group">
-              <label>Select Student</label>
-          <select class="form-control" [(ngModel)]="selectedStudentId" name="studentId" required>
-            <option value="" disabled selected>Select Student</option>
-            <option *ngFor="let student of availableStudents" [value]="student.id">
-              {{ student.name }} - {{ student.gender }} - DOB: {{ student.dob }} - {{ student.address }}
-            </option>
-          </select>
-        </div>
-        <div class="form-error" *ngIf="assignError" style="color:#b71c1c;font-weight:500;margin-top:0.5rem;">{{ assignError }}</div>
-        <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
-          <button class="modal-action-btn btn btn-success" type="submit">Assign</button>
-          <button class="modal-action-btn btn btn-secondary" type="button" (click)="cancelAssignStudent()">Cancel</button>
-        </div>
+          <div class="form-group">
+            <label>Select Student</label>
+            <select class="form-control" [(ngModel)]="selectedStudentId" name="studentId" required [disabled]="availableStudents.length === 0">
+              <option value="" disabled selected>Select Student</option>
+              <option *ngFor="let student of availableStudents" [value]="student.id">
+                {{ student.name }} - {{ student.gender }} - DOB: {{ student.dob }} - {{ student.address }}
+              </option>
+            </select>
+          </div>
+          <div class="form-error" *ngIf="assignError" style="color:#b71c1c;font-weight:500;margin-top:0.5rem;">{{ assignError }}</div>
+          <div *ngIf="assignSuccess" class="form-success" style="color:#388e3c;font-weight:500;margin-top:0.5rem;">{{ assignSuccess }}</div>
+          <div *ngIf="!assignError && availableStudents.length === 0" class="form-error" style="color:#b71c1c;font-weight:500;margin-top:0.5rem;">No students available for assignment.</div>
+          <div class="form-actions d-flex gap-2 mt-4 justify-content-end">
+            <button class="modal-action-btn btn btn-success" type="submit" [disabled]="!selectedStudentId || availableStudents.length === 0">Assign</button>
+            <button class="modal-action-btn btn btn-secondary" type="button" (click)="cancelAssignStudent()">Cancel</button>
+          </div>
+        </ng-container>
       </form>
     </div>
   </div>
@@ -150,7 +157,9 @@
             <!-- ...existing card view code... -->
             <div class="room-card-top-row mb-2">
               <div class="room-title">Room {{ room.roomNumber }} <span class="room-type-chip">{{ room.roomType }}</span>
-                <span class="room-status-chip ms-2" [ngClass]="room.status.toLowerCase()">{{ room.status }}</span>
+                <span class="room-status-chip ms-2" [ngClass]="isRoomFull(room) ? 'full' : room.status.toLowerCase()">
+                  {{ isRoomFull(room) ? 'FULL' : room.status }}
+                </span>
               </div>
               <div class="room-actions d-flex gap-2">
                 <button class="icon-btn circle" title="Assign Student" (click)="$event.stopPropagation(); openAssignStudent(room.id)"><span class="material-icons">person_add</span></button>
@@ -159,7 +168,7 @@
               </div>
             </div>
             <div class="room-details">
-              House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Capacity: {{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
+              House: <b>{{ houseNameMap[room.houseId] }}</b> | Floor: {{ room.roomNumber.charAt(0) }} | Occupied: {{ getOccupiedCount(room) }}/{{ room.capacity }} | Rent: ₹{{ room.rentAmount }}
             </div>
             <div class="room-actions-student-toggle" style="display:flex;align-items:center;justify-content:flex-end;gap:1rem;margin-top:0.5rem;">
               <button class="student-toggle-btn" (click)="$event.stopPropagation(); showStudents[room.id] = !showStudents[room.id]">
@@ -202,9 +211,9 @@
               <tr *ngFor="let room of filteredRooms">
                 <td style="padding:0.75rem 1rem;">{{ room.roomNumber }}</td>
                 <td style="padding:0.75rem 1rem;">{{ room.roomType }}</td>
-                <td style="padding:0.75rem 1rem;"><span class="room-status-chip" [ngClass]="room.status.toLowerCase()">{{ room.status }}</span></td>
+                <td style="padding:0.75rem 1rem;"><span class="room-status-chip" [ngClass]="isRoomFull(room) ? 'full' : room.status.toLowerCase()">{{ isRoomFull(room) ? 'FULL' : room.status }}</span></td>
                 <td style="padding:0.75rem 1rem;">{{ houseNameMap[room.houseId] }}</td>
-                <td style="padding:0.75rem 1rem;">{{ room.capacity }}</td>
+                <td style="padding:0.75rem 1rem;">{{ getOccupiedCount(room) }}/{{ room.capacity }}</td>
                 <td style="padding:0.75rem 1rem;">₹{{ room.rentAmount }}</td>
                 <td style="padding:0.75rem 1rem;">
                   <button class="icon-btn circle" title="Assign Student" (click)="$event.stopPropagation(); openAssignStudent(room.id)"><span class="material-icons">person_add</span></button>

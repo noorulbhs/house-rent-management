@@ -29,6 +29,7 @@ export const routes: Routes = [
       { path: 'students', loadComponent: () => import('./features/student-management/student-management.component').then(m => m.StudentManagementComponent), canActivate: [authGuard], data: { role: 'OWNER' } },
       { path: 'student-dashboard', component: StudentDashboardComponent, canActivate: [authGuard], data: { role: 'STUDENT' } },
       { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [authGuard], data: { role: 'ADMIN' } },
+      { path: 'payments', loadComponent: () => import('./features/payments/payment-summary/payment-summary.component').then(m => m.PaymentSummaryComponent), canActivate: [authGuard], data: { role: 'OWNER' } },
       // ...other routes
     ]
   }

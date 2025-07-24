@@ -1,5 +1,9 @@
 <button mat-icon-button (click)="toggleUserDropdown()" #userIconBtn><mat-icon>account_circle</mat-icon></button>
-<div *ngIf="isMobile && showUserDropdown" class="user-dropdown-overlay" (click)="closeUserDropdown()"></div>
-<div *ngIf="isMobile && showUserDropdown" class="user-dropdown" [style.right]="'16px'">
+<div *ngIf="showUserDropdown" class="user-dropdown-overlay" (click)="closeUserDropdown()"></div>
+<div *ngIf="showUserDropdown" class="user-dropdown" [style.right]="'16px'">
   <div class="user-greeting">Hi, {{ ownerName }} 👋</div>
+  <button mat-menu-item (click)="goToRentSettings()">
+    <mat-icon>settings</mat-icon>
+    Rent Settings
+  </button>
 </div>

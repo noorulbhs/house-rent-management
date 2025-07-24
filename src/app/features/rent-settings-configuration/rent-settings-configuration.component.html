@@ -1,0 +1,246 @@
+<div class="settings-container">
+  <mat-horizontal-stepper linear>
+    <mat-step label="General Settings">
+      <form (ngSubmit)="saveGeneralSettings()">
+        <mat-form-field appearance="outline">
+          <mat-label>Rent Due Date</mat-label>
+          <input matInput [(ngModel)]="general.dueDate" name="dueDate" type="date" required />
+          <mat-error *ngIf="general.dueDate && !isValidDate(general.dueDate)">Invalid date format</mat-error>
+          <mat-error *ngIf="!general.dueDate">Due date is required</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Grace Period (days)</mat-label>
+          <input matInput [(ngModel)]="general.gracePeriod" name="gracePeriod" type="number" required />
+          <mat-error *ngIf="general.gracePeriod != null && general.gracePeriod < 0">Grace period must be positive</mat-error>
+          <mat-error *ngIf="!general.gracePeriod">Grace period is required</mat-error>
+        </mat-form-field>
+        <mat-slide-toggle [(ngModel)]="general.autoGenerate" name="autoGenerate">Auto-generate Bills</mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="general.partialPayment" name="partialPayment">Allow Partial Payment</mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="general.manualApproval" name="manualApproval">Require Manual Approval</mat-slide-toggle>
+        <div class="d-flex gap-2 mt-3 justify-content-end">
+          <button mat-raised-button color="primary" type="submit">Save & Continue</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step label="Miscellaneous Charges">
+      <div>
+        <form (ngSubmit)="addMiscCharge()" class="d-flex gap-2 mb-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="newCharge.name" name="chargeName" required />
+            <mat-error *ngIf="!newCharge.name">Name is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select [(ngModel)]="newCharge.type" name="chargeType" required>
+              <mat-option value="Monthly">Monthly</mat-option>
+              <mat-option value="One-Time">One-Time</mat-option>
+            </mat-select>
+            <mat-error *ngIf="!newCharge.type">Type is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Frequency</mat-label>
+            <input matInput [(ngModel)]="newCharge.frequency" name="chargeFrequency" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="newCharge.amount" name="chargeAmount" required />
+            <mat-error *ngIf="newCharge.amount != null && newCharge.amount <= 0">Amount must be positive</mat-error>
+            <mat-error *ngIf="!newCharge.amount">Amount is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Apply To</mat-label>
+            <input matInput [(ngModel)]="newCharge.applyTo" name="chargeApplyTo" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Add</button>
+        </form>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Frequency</th>
+              <th>Amount</th>
+              <th>Apply To</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let charge of miscCharges">
+              <td *ngIf="editCharge?.id !== charge.id">{{ charge.name }}</td>
+              <td *ngIf="editCharge?.id !== charge.id">{{ charge.type }}</td>
+              <td *ngIf="editCharge?.id !== charge.id">{{ charge.frequency }}</td>
+              <td *ngIf="editCharge?.id !== charge.id">{{ charge.amount }}</td>
+              <td *ngIf="editCharge?.id !== charge.id">{{ charge.applyTo }}</td>
+              <td *ngIf="editCharge?.id !== charge.id">
+                <button mat-icon-button (click)="editMiscCharge(charge)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteMiscCharge(charge.id)"><mat-icon>delete</mat-icon></button>
+              </td>
+              <!-- Edit row -->
+              <ng-container *ngIf="editCharge?.id === charge.id">
+                <td><input matInput [(ngModel)]="editCharge!.name" name="editName" /></td>
+                <td>
+                  <mat-select [(ngModel)]="editCharge!.type" name="editType">
+                    <mat-option value="Monthly">Monthly</mat-option>
+                    <mat-option value="One-Time">One-Time</mat-option>
+                  </mat-select>
+                </td>
+                <td><input matInput [(ngModel)]="editCharge!.frequency" name="editFrequency" /></td>
+                <td><input matInput type="number" [(ngModel)]="editCharge!.amount" name="editAmount" /></td>
+                <td><input matInput [(ngModel)]="editCharge!.applyTo" name="editApplyTo" /></td>
+                <td>
+                  <button mat-icon-button color="primary" (click)="updateMiscCharge()"><mat-icon>check</mat-icon></button>
+                  <button mat-icon-button (click)="editCharge = null"><mat-icon>close</mat-icon></button>
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+        <div class="d-flex gap-2 mt-3 justify-content-end">
+          <button mat-raised-button color="primary" matStepperNext>Continue</button>
+        </div>
+      </div>
+    </mat-step>
+    <mat-step label="Due Date Overrides">
+      <div>
+        <form (ngSubmit)="addOverride()" class="d-flex gap-2 mb-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Room</mat-label>
+            <input matInput [(ngModel)]="newOverride.room" name="overrideRoom" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Student</mat-label>
+            <input matInput [(ngModel)]="newOverride.student" name="overrideStudent" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Due Date</mat-label>
+            <input matInput type="date" [(ngModel)]="newOverride.dueDate" name="overrideDueDate" required />
+            <mat-error *ngIf="newOverride.dueDate && !isValidDate(newOverride.dueDate)">Invalid date format</mat-error>
+            <mat-error *ngIf="!newOverride.dueDate">Due date is required</mat-error>
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Add</button>
+        </form>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Student</th>
+              <th>Due Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let override of overrides">
+              <td *ngIf="editOverride?.id !== override.id">{{ override.room }}</td>
+              <td *ngIf="editOverride?.id !== override.id">{{ override.student }}</td>
+              <td *ngIf="editOverride?.id !== override.id">{{ override.dueDate }}</td>
+              <td *ngIf="editOverride?.id !== override.id">
+                <button mat-icon-button (click)="editDueDateOverride(override)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteDueDateOverride(override.id)"><mat-icon>delete</mat-icon></button>
+              </td>
+              <!-- Edit row -->
+              <ng-container *ngIf="editOverride?.id === override.id">
+                <td><input matInput [(ngModel)]="editOverride!.room" name="editOverrideRoom" /></td>
+                <td><input matInput [(ngModel)]="editOverride!.student" name="editOverrideStudent" /></td>
+                <td><input matInput type="date" [(ngModel)]="editOverride!.dueDate" name="editOverrideDueDate" /></td>
+                <td>
+                  <button mat-icon-button color="primary" (click)="updateDueDateOverride()"><mat-icon>check</mat-icon></button>
+                  <button mat-icon-button (click)="editOverride = null"><mat-icon>close</mat-icon></button>
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+        <div class="d-flex gap-2 mt-3 justify-content-end">
+          <button mat-raised-button color="primary" matStepperNext>Continue</button>
+        </div>
+      </div>
+    </mat-step>
+    <mat-step label="Approval Rules">
+      <form (ngSubmit)="saveApprovalRules()">
+        <mat-slide-toggle [(ngModel)]="approvalRules.requireApproval" name="requireApproval">Require Payment Approval</mat-slide-toggle>
+        <mat-form-field appearance="outline">
+          <mat-label>Payment Modes</mat-label>
+          <mat-select [(ngModel)]="approvalRules.paymentModes" name="paymentModes" multiple>
+            <mat-option value="Cash">Cash</mat-option>
+            <mat-option value="Online">Online</mat-option>
+            <mat-option value="UPI">UPI</mat-option>
+          </mat-select>
+          <mat-error *ngIf="approvalRules.requireApproval && (!approvalRules.paymentModes || approvalRules.paymentModes.length === 0)">Select at least one payment mode</mat-error>
+        </mat-form-field>
+        <div class="d-flex gap-2 mt-3 justify-content-end">
+          <button mat-raised-button color="primary" type="submit">Save</button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+  <mat-tab-group>
+    <mat-tab label="Configuration">
+      <mat-horizontal-stepper linear>
+        <mat-step label="General Settings">
+          <form (ngSubmit)="saveGeneralSettings()">
+            <mat-form-field appearance="outline">
+              <mat-label>Rent Due Date</mat-label>
+              <input matInput [(ngModel)]="general.dueDate" name="dueDate" type="date" required />
+              <mat-error *ngIf="!general.dueDate">Due date is required</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Grace Period (days)</mat-label>
+              <input matInput [(ngModel)]="general.gracePeriod" name="gracePeriod" type="number" required />
+              <mat-error *ngIf="!general.gracePeriod">Grace period is required</mat-error>
+            </mat-form-field>
+            <mat-slide-toggle [(ngModel)]="general.autoGenerate" name="autoGenerate">Auto-generate Bills</mat-slide-toggle>
+            <mat-slide-toggle [(ngModel)]="general.partialPayment" name="partialPayment">Allow Partial Payment</mat-slide-toggle>
+            <mat-slide-toggle [(ngModel)]="general.manualApproval" name="manualApproval">Require Manual Approval</mat-slide-toggle>
+            <div class="d-flex gap-2 mt-3 justify-content-end">
+              <button mat-raised-button color="primary" type="submit">Save & Continue</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step label="Approval Rules">
+          <form (ngSubmit)="saveApprovalRules()">
+            <mat-slide-toggle [(ngModel)]="approvalRules.requireApproval" name="requireApproval">Require Payment Approval</mat-slide-toggle>
+            <mat-form-field appearance="outline">
+              <mat-label>Payment Modes</mat-label>
+              <mat-select [(ngModel)]="approvalRules.paymentModes" name="paymentModes" multiple>
+                <mat-option value="Cash">Cash</mat-option>
+                <mat-option value="Online">Online</mat-option>
+                <mat-option value="UPI">UPI</mat-option>
+              </mat-select>
+              <mat-error *ngIf="approvalRules.requireApproval && (!approvalRules.paymentModes || approvalRules.paymentModes.length === 0)">Select at least one payment mode</mat-error>
+            </mat-form-field>
+            <div class="d-flex gap-2 mt-3 justify-content-end">
+              <button mat-raised-button color="primary" type="submit">Save</button>
+            </div>
+          </form>
+        </mat-step>
+      </mat-horizontal-stepper>
+    </mat-tab>
+    <mat-tab label="Dynamic Preview">
+      <div class="preview-section mt-4 mb-4 p-3 border rounded bg-light">
+        <h4>Dynamic Preview</h4>
+        <div><strong>Due Date:</strong> {{ preview.general?.dueDate }}</div>
+        <div><strong>Grace Period:</strong> {{ preview.general?.gracePeriod }}</div>
+        <div><strong>Misc Charges:</strong>
+          <ul>
+            <li *ngFor="let charge of preview.miscCharges">
+              {{ charge.name }} - {{ charge.type }} - {{ charge.frequency }} - {{ charge.amount }} - {{ charge.applyTo }}
+            </li>
+          </ul>
+        </div>
+        <div><strong>Overrides:</strong>
+          <ul>
+            <li *ngFor="let override of preview.overrides">
+              Room: {{ override.room }} | Student: {{ override.student }} | Due Date: {{ override.dueDate }}
+            </li>
+          </ul>
+        </div>
+        <div><strong>Approval Rules:</strong>
+          <span *ngIf="preview.approvalRules?.requireApproval">Approval Required</span>
+          <span *ngIf="!preview.approvalRules?.requireApproval">No Approval Required</span>
+          <span>Modes: {{ preview.approvalRules?.paymentModes?.join(', ') }}</span>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

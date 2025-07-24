@@ -1,1 +1,48 @@
+.user-dropdown {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  min-width: 180px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+  padding: 1rem 0.5rem 0.5rem 0.5rem;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.user-dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  z-index: 1199;
+}
+.user-greeting {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #2e3a59;
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
+}
+button[mat-menu-item] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #2e3a59;
+  font-size: 1rem;
+  padding: 0.5rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+button[mat-menu-item]:hover {
+  background: #f5f7fa;
+}
 

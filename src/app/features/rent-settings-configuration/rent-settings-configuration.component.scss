@@ -1,0 +1,16 @@
+.settings-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(44,62,80,0.10);
+  padding: 2rem;
+}
+mat-form-field {
+  width: 100%;
+  margin-bottom: 1.2rem;
+}
+mat-slide-toggle {
+  display: block;
+  margin-bottom: 1rem;
+}

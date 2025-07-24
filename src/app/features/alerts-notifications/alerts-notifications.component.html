@@ -1,0 +1,163 @@
+<div class="alerts-notifications-container">
+  <mat-tab-group>
+    <mat-tab label="System Alerts">
+      <div class="alerts-list">
+        <h3 class="section-header"><mat-icon>notifications_active</mat-icon> System Alerts</h3>
+        <mat-form-field appearance="outline" class="mb-3 w-100">
+          <mat-label>Search Alerts</mat-label>
+          <input matInput [(ngModel)]="alertSearch" placeholder="Type or date..." />
+        </mat-form-field>
+        <div *ngIf="filteredAlerts.length === 0" class="empty-alerts">
+          <mat-icon color="warn">info</mat-icon> No alerts found.
+        </div>
+        <div *ngFor="let alert of filteredAlerts" class="mb-3">
+          <mat-card [ngClass]="{'resolved': alert.resolved}" class="alert-card">
+            <mat-card-header>
+              <mat-icon class="alert-type-icon" [ngClass]="{'active': !alert.resolved, 'resolved': alert.resolved}">
+                {{ alert.resolved ? 'check_circle' : 'error_outline' }}
+              </mat-icon>
+              <mat-card-title>
+                <span>{{ alert.type }}</span>
+                <mat-chip color="primary" *ngIf="!alert.resolved">Active</mat-chip>
+                <mat-chip color="accent" *ngIf="alert.resolved">Resolved</mat-chip>
+              </mat-card-title>
+              <mat-card-subtitle class="text-muted">{{ alert.timestamp | date:'short' }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div>{{ alert.message }}</div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-stroked-button color="primary" (click)="sendReminder(alert.id)" [disabled]="alert.resolved">
+                <mat-icon>send</mat-icon> Send Reminder
+              </button>
+              <button mat-stroked-button color="accent" (click)="markAlertResolved(alert.id)" [disabled]="alert.resolved">
+                <mat-icon>done</mat-icon> Mark as Resolved
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Manual Notifications">
+      <h3 class="section-header"><mat-icon>send</mat-icon> Manual Notifications</h3>
+      <form (ngSubmit)="sendNotification()" class="notification-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="notificationForm.title" name="title" required />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Message Body</mat-label>
+          <textarea matInput [(ngModel)]="notificationForm.body" name="body" required></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Audience</mat-label>
+          <mat-select [(ngModel)]="notificationForm.audience" name="audience" required>
+            <mat-option value="All Students">All Students</mat-option>
+            <mat-option value="By Room">By Room</mat-option>
+            <mat-option value="By House">By House</mat-option>
+            <mat-option value="Individual">Individual Student</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Delivery Type</mat-label>
+          <mat-select [(ngModel)]="notificationForm.deliveryType" name="deliveryType" multiple required>
+            <mat-option value="Email">Email</mat-option>
+            <mat-option value="SMS">SMS</mat-option>
+            <mat-option value="App">App</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-slide-toggle [(ngModel)]="notificationForm.scheduleLater" name="scheduleLater">Schedule Later</mat-slide-toggle>
+        <mat-form-field appearance="outline" *ngIf="notificationForm.scheduleLater">
+          <mat-label>Schedule Date</mat-label>
+          <input matInput [(ngModel)]="notificationForm.scheduledFor" name="scheduledFor" type="datetime-local" />
+        </mat-form-field>
+        <div class="d-flex gap-2 mt-3 justify-content-end">
+          <button mat-raised-button color="primary" type="submit">Send Notification</button>
+        </div>
+      </form>
+      <div class="sent-notifications mt-4">
+        <h5 class="section-header"><mat-icon>history</mat-icon> Sent Notifications</h5>
+        <mat-card *ngFor="let n of notifications" class="mb-2 notification-history-card">
+          <mat-card-header>
+            <mat-card-title>{{ n.title }}</mat-card-title>
+            <mat-card-subtitle class="text-muted">Sent: {{ n.sentAt | date:'short' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div>{{ n.body }}</div>
+            <div class="text-muted">Audience: {{ n.audience }} | Delivery: {{ n.deliveryType.join(', ') }}</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Scheduled Reminders">
+      <h3 class="section-header"><mat-icon>event_note</mat-icon> Scheduled Reminders</h3>
+      <div class="reminders-table">
+        <table mat-table [dataSource]="reminders" class="mat-elevation-z1 w-100 reminders-table-ui">
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Title</th>
+            <td mat-cell *matCellDef="let r">{{ r.title }}</td>
+          </ng-container>
+          <ng-container matColumnDef="target">
+            <th mat-header-cell *matHeaderCellDef>Target</th>
+            <td mat-cell *matCellDef="let r">{{ r.target }}</td>
+          </ng-container>
+          <ng-container matColumnDef="scheduleDate">
+            <th mat-header-cell *matHeaderCellDef>Schedule Date</th>
+            <td mat-cell *matCellDef="let r">{{ r.scheduleDate | date:'short' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let r">{{ r.type }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let r">
+              <mat-chip color="primary" *ngIf="r.status === 'Active'">Active</mat-chip>
+              <mat-chip color="accent" *ngIf="r.status === 'Sent'">Sent</mat-chip>
+              <mat-chip color="warn" *ngIf="r.status === 'Expired'">Expired</mat-chip>
+              <span class="reminder-actions">
+                <button mat-icon-button color="primary" (click)="startEditReminder(r)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteReminder(r.id)"><mat-icon>cancel</mat-icon></button>
+              </span>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['title','target','scheduleDate','type','status']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['title','target','scheduleDate','type','status'];"></tr>
+          <!-- Inline edit row -->
+          <tr *ngIf="editingReminder" class="reminder-edit-row">
+            <td colspan="5">
+              <form class="d-flex gap-2 align-items-center" (ngSubmit)="saveEditReminder()">
+                <mat-form-field appearance="outline">
+                  <mat-label>Title</mat-label>
+                  <input matInput [(ngModel)]="editingReminder.title" name="editTitle" required />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Target</mat-label>
+                  <input matInput [(ngModel)]="editingReminder.target" name="editTarget" required />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Schedule Date</mat-label>
+                  <input matInput [(ngModel)]="editingReminder.scheduleDate" name="editScheduleDate" type="datetime-local" required />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Type</mat-label>
+                  <input matInput [(ngModel)]="editingReminder.type" name="editType" required />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Status</mat-label>
+                  <mat-select [(ngModel)]="editingReminder.status" name="editStatus" required>
+                    <mat-option value="Active">Active</mat-option>
+                    <mat-option value="Sent">Sent</mat-option>
+                    <mat-option value="Expired">Expired</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button mat-raised-button color="primary" type="submit">Save</button>
+                <button mat-stroked-button type="button" (click)="cancelEditReminder()">Cancel</button>
+              </form>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

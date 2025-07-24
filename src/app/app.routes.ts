@@ -31,6 +31,7 @@ export const routes: Routes = [
       { path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [authGuard], data: { role: 'ADMIN' } },
       { path: 'payments', loadComponent: () => import('./features/payments/payment-summary/payment-summary.component').then(m => m.PaymentSummaryComponent), canActivate: [authGuard], data: { role: 'OWNER' } },
       { path: 'rent-settings-configuration', loadComponent: () => import('./features/rent-settings-configuration/rent-settings-configuration.component').then(m => m.RentSettingsConfigurationComponent), canActivate: [authGuard], data: { role: 'OWNER' } },
+      { path: 'alerts-notifications', loadComponent: () => import('./features/alerts-notifications/alerts-notifications.component').then(m => m.AlertsNotificationsComponent), canActivate: [authGuard], data: { role: 'OWNER' } },
       // ...other routes
     ]
   }

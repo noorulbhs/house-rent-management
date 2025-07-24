@@ -12,8 +12,12 @@ import { MatDividerModule } from '@angular/material/divider';
   styleUrl: './notification.component.scss'
 })
 export class NotificationComponent {
-  @Input() alerts: Array<{ message: string; type: string }> = [];
+  @Input() alerts: Array<{ message: string; type: string; resolved?: boolean }> = [];
   @Input() showAlerts = false;
   @Input() toggleAlerts!: () => void;
   @Input() closeAlerts!: () => void;
+
+  get unresolvedAlertsCount(): number {
+    return this.alerts ? this.alerts.filter(a => !a.resolved).length : 0;
+  }
 }

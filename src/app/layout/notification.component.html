@@ -1,6 +1,6 @@
 <button mat-icon-button class="notification-btn" (click)="toggleAlerts()">
   <mat-icon>notifications</mat-icon>
-  <span *ngIf="alerts.length > 0" class="notification-badge">{{ alerts.length }}</span>
+  <span *ngIf="unresolvedAlertsCount > 0" class="notification-badge">{{ unresolvedAlertsCount }}</span>
 </button>
 <ng-container *ngIf="showAlerts">
   <div class="alerts-overlay" (click)="closeAlerts()"></div>

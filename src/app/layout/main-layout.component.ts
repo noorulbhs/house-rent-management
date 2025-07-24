@@ -14,6 +14,7 @@ import { HeaderComponent } from './header.component';
 import { NotificationComponent } from './notification.component';
 import { UserIconComponent } from './user-icon.component';
 import { MockDashboardService } from '../service/mock-dashboard.service';
+import { AlertsNotificationsService } from '../features/alerts-notifications/alerts-notifications.service';
 import { MOCK_MENU_ITEMS, MOCK_QUICK_ACTIONS, MenuItem } from '../mock-data/mock-menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
@@ -44,23 +45,23 @@ export class MainLayoutComponent {
   showAlerts = false;
   showUserDropdown = false;
   ownerName = '';
-  alerts: Array<{ message: string; type: string }> = [];
-  menuItems: MenuItem[] = MOCK_MENU_ITEMS;
+  alerts: import('../features/alerts-notifications/alerts-notifications.model').Alert[] = [];
+  menuItems: MenuItem[] = [
+    ...MOCK_MENU_ITEMS,
+    { id: 'alerts', label: 'Alerts & Notifications', icon: 'notifications', route: '/alerts-notifications' }
+  ];
   quickActions: MenuItem[] = MOCK_QUICK_ACTIONS;
 
   constructor(
     @Optional() private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: Object,
-    @Inject(MockDashboardService) private mockDashboardService: MockDashboardService,
+    private alertsNotificationsService: AlertsNotificationsService,
     private dialog: MatDialog
   ) {
     const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.ownerName = user?.name || 'Owner';
-    if (user?.id) {
-      this.mockDashboardService.getDashboardByUserId(user.id).subscribe((dashboard: any) => {
-        this.alerts = dashboard?.alerts || [];
-      });
-    }
+    // Fetch alerts from AlertsNotificationsService
+    this.alerts = this.alertsNotificationsService.getAlerts();
     if (isPlatformBrowser(this.platformId) && this.breakpointObserver) {
       this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
         this.isMobile = result.matches;

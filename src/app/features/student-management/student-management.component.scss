@@ -1,3 +1,150 @@
+// Miscellaneous Charges Table Styles
+.misc-charges-title {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #2e3a59;
+  margin-bottom: 0.7rem;
+}
+.misc-charges-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+}
+.misc-charges-table th, .misc-charges-table td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e6ee;
+}
+.misc-charges-table th {
+  background: #e3e6ee;
+  font-weight: 600;
+  color: #3f51b5;
+}
+.misc-charges-table tr:last-child td {
+  border-bottom: none;
+}
+.misc-charge-chip {
+  font-size: 0.92rem;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 0.18rem 0.7rem;
+  margin-right: 0.2rem;
+  background: #e3e6ee;
+  color: #2e3a59;
+  text-transform: capitalize;
+}
+// Student Detail Header Row
+.student-detail-header-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1.2rem;
+}
+.student-avatar {
+  background: linear-gradient(135deg, #3f51b5 0%, #e3f2fd 100%);
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.13);
+}
+.student-avatar-icon {
+  font-size: 3.2rem;
+  color: #fff;
+}
+.student-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2e3a59;
+}
+.student-status-chip {
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: #c5cae9;
+  color: #2e3a59;
+  margin-left: 0.7rem;
+}
+.student-detail-edit-btn {
+  margin-left: auto;
+}
+.student-action-btn-break {
+  flex-basis: 100%;
+  margin-top: 2.4rem;
+}
+@media (min-width: 600px) {
+  .student-action-btn-break {
+    flex-basis: auto;
+    margin-top: 0;
+  }
+}
+// Student Detail Action Buttons
+.student-detail-actions {
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.student-action-btn {
+  min-width: 140px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  padding: 0.6rem 1.2rem;
+  margin-right: 2.4rem;
+}
+// Ensure gap above any button that wraps to the next row
+.student-detail-actions {
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.student-action-btn {
+  min-width: 140px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  padding: 0.6rem 1.2rem;
+  margin-right: 2.4rem;
+}
+.student-action-btn:last-child {
+  margin-right: 0;
+}
+.student-detail-actions {
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.student-action-btn {
+  min-width: 140px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  padding: 0.6rem 1.2rem;
+  margin-right: 2.4rem;
+}
+.student-action-btn:last-child {
+  margin-right: 0;
+}
+
+/* Add gap above the third button only when it wraps to the next row */
+.student-detail-actions .student-action-btn:nth-child(3) {
+  margin-top: 2.4rem;
+}
+@media (min-width: 600px) {
+  .student-detail-actions .student-action-btn:nth-child(3) {
+    margin-top: 0;
+  }
+}
 .enhanced-student-detail {
   background: #fff;
   border-radius: 14px;
@@ -57,6 +204,89 @@
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+.student-rent-history {
+  background: #f5f7fa;
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  margin-top: 1.2rem;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+}
+.rent-history-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2e3a59;
+  margin-bottom: 0.7rem;
+}
+.rent-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+}
+.rent-history-table th, .rent-history-table td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e3e6ee;
+}
+.rent-history-table th {
+  background: #e3e6ee;
+  font-weight: 600;
+  color: #3f51b5;
+}
+.rent-history-table tr:last-child td {
+  border-bottom: none;
+}
+.mat-chip {
+  display: inline-block;
+  padding: 0.18rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  background: #e3e6ee;
+  color: #2e3a59;
+  vertical-align: middle;
+  text-transform: capitalize;
+}
+.mat-chip-success {
+  background: #c8e6c9;
+  color: #388e3c;
+}
+.mat-chip-warning {
+  background: #fff9c4;
+  color: #fbc02d;
+}
+.mat-chip-error {
+  background: #ffcdd2;
+  color: #c62828;
+}
+.student-detail-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+.student-detail-actions .modal-action-btn {
+  min-width: 140px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+  padding: 0.6rem 1.2rem;
+}
+.student-detail-actions .btn-primary {
+  background: #3f51b5 !important;
+  color: #fff !important;
+}
+.student-detail-actions .btn-warning {
+  background: #ffe082 !important;
+  color: #b71c1c !important;
+}
+.student-detail-actions .btn-info {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
+}
 }
 .student-detail-row {
   display: flex;

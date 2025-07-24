@@ -12,6 +12,26 @@ export interface Student {
   address?: string;
   emergencyContact?: string;
   status?: 'ACTIVE' | 'MOVED_OUT' | 'INACTIVE';
+  rentHistory?: Array<{
+    month: string;
+    amount: number;
+    paidDate: string;
+    status: 'PAID' | 'DUE' | 'OVERDUE';
+  }>;
+  miscCharges?: Array<{
+    description: string;
+    amount: number;
+    status: 'PAID' | 'DUE';
+  }>;
+  documents?: Array<{
+    name: string;
+    url?: string;
+  }>;
+  timeline?: Array<{
+    title: string;
+    date: string;
+    description: string;
+  }>;
 }
 
 export const MOCK_STUDENTS: Student[] = [
@@ -28,6 +48,23 @@ export const MOCK_STUDENTS: Student[] = [
     address: '123 Main St, City',
     emergencyContact: '9876543210',
     status: 'ACTIVE',
+    rentHistory: [
+      { month: 'June 2025', amount: 5000, paidDate: '2025-06-05', status: 'PAID' },
+      { month: 'July 2025', amount: 5000, paidDate: '', status: 'DUE' },
+    ],
+    miscCharges: [
+      { description: 'Late Fee', amount: 200, status: 'DUE' },
+      { description: 'Key Replacement', amount: 150, status: 'PAID' }
+    ],
+    documents: [
+      { name: 'Aadhaar Card', url: 'https://example.com/amit-aadhaar.pdf' },
+      { name: 'College ID' }
+    ],
+    timeline: [
+      { title: 'Room Assigned', date: '2024-06-01', description: 'Assigned to Room r1.' },
+      { title: 'Rent Paid', date: '2025-06-05', description: 'Paid rent for June 2025.' },
+      { title: 'Late Fee Incurred', date: '2025-07-10', description: 'Late fee applied for July.' }
+    ]
   },
   {
     id: 'student-2',

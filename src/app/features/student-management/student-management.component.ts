@@ -1,3 +1,4 @@
+import { MatDividerModule } from '@angular/material/divider';
 // ...existing code...
 import { Component, OnInit } from '@angular/core';
 import { MockRoomService } from '../../service/mock-room.service';
@@ -5,6 +6,11 @@ import { Room } from '../../mock-data/mock-rooms';
 import { MOCK_HOUSES } from '../../mock-data/mock-houses';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MockStudentService } from './mock-student.service';
 import { Student } from './mock-students';
@@ -12,11 +18,33 @@ import { Student } from './mock-students';
 @Component({
   selector: 'app-student-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatTableModule,
+    MatDividerModule
+  ],
   templateUrl: './student-management.component.html',
   styleUrl: './student-management.component.scss'
 })
 export class StudentManagementComponent implements OnInit {
+  hasOutstandingDues(student: Student | null): boolean {
+    if (!student || !student.rentHistory) return false;
+    return student.rentHistory.some(payment => payment && payment.status === 'DUE');
+  }
+  transferRoom(student: Student) {
+    alert('Transfer Room feature coming soon!');
+  }
+  vacateStudent(student: Student) {
+    alert('Vacate feature coming soon!');
+  }
+  generateReport(student: Student) {
+    alert('Generate Report feature coming soon!');
+  }
   rooms: Room[] = [];
   houseNameMap: { [houseId: string]: string } = {};
   students: Student[] = [];
